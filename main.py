@@ -15,7 +15,7 @@ background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 game_setup = GameSetup(window)
 
-game_setup.create_button("Nowa gra", 130, 16, 119)
+game_setup.create_button("Nowa gra", 130, 16, 119, game_setup.reset_game)
 game_setup.create_button("Cofnij", 265, 16, 119)
 game_setup.create_label("Punkty: 1000", 711, 16, 119)
 game_setup.create_label("Ruchy: 230", 846, 16, 119)

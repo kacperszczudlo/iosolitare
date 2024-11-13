@@ -1,3 +1,4 @@
+import os
 from tkinter import Label, Button, messagebox
 from PIL import Image, ImageTk
 from cardDeck import CardDeck
@@ -9,6 +10,30 @@ class GameSetup:
         self.window = window
         self.card_labels = []
         self.deck = CardDeck()
+        self.card_positions = []
+
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.resources_dir = os.path.join(script_dir, 'resources')
+        self.cards_dir = os.path.join(self.resources_dir, 'cards')
+
+        self.lower_stack_areas = [
+    {'x': 130, 'y': 378, 'width': 100, 'height': 145},  
+    {'x': 270, 'y': 378, 'width': 100, 'height': 145},  
+    {'x': 410, 'y': 378, 'width': 100, 'height': 145},  
+    {'x': 550, 'y': 378, 'width': 100, 'height': 145},  
+    {'x': 690, 'y': 378, 'width': 100, 'height': 145},  
+    {'x': 830, 'y': 378, 'width': 100, 'height': 145},  
+    {'x': 970, 'y': 378, 'width': 100, 'height': 145}, 
+]
+
+        self.upper_stack_areas = [
+    {'x': 130, 'y': 153, 'width': 100, 'height': 145},
+    {'x': 270, 'y': 153, 'width': 100, 'height': 145},
+    {'x': 550, 'y': 153, 'width': 100, 'height': 145},
+    {'x': 690, 'y': 153, 'width': 100, 'height': 145},
+    {'x': 830, 'y': 153, 'width': 100, 'height': 145},
+    {'x': 970, 'y': 153, 'width': 100, 'height': 145},
+]
 
     def create_button(self, text, x, y, width, command=None):
         # Tworzy przycisk w interfejsie użytkownika.
@@ -22,15 +47,16 @@ class GameSetup:
 
     def create_placeholder(self, x, y):
         # Umieszcza obraz zastępczy w interfejsie.
-        placeholder_image = Image.open("resources/placeholder.png").resize((100, 145))
+        placeholder_path = os.path.join(self.resources_dir, 'placeholder.png')
+        placeholder_image = Image.open(placeholder_path).resize((100, 145))
         placeholder_photo = ImageTk.PhotoImage(placeholder_image)
         placeholder_label = Label(self.window, image=placeholder_photo, bd=0)
         placeholder_label.image = placeholder_photo
         placeholder_label.place(x=x, y=y)
-
+    
     def create_card(self, x, y, card):
         # Tworzy i wyświetla kartę na planszy gry.
-        card_image_path = card.get_image()
+        card_image_path = os.path.join(self.cards_dir, os.path.basename(card.get_image()))
         card_image = Image.open(card_image_path).resize((100, 145))
         card_photo = ImageTk.PhotoImage(card_image)
         card_label = Label(self.window, image=card_photo, bd=0)
@@ -38,7 +64,6 @@ class GameSetup:
         card_label.place(x=x, y=y)
         card_label.card_object = card
 
-        # Dodaje obsługę zdarzeń dla karty (kliknięcie, przeciąganie, zwolnienie).
         card_label.bind("<ButtonPress-1>", self.on_card_click)
         card_label.bind("<B1-Motion>", self.on_card_drag)
         card_label.bind("<ButtonRelease-1>", self.on_card_release)
@@ -46,7 +71,7 @@ class GameSetup:
         return card_label
 
     def display_initial_deal(self, columns):
-        # Wyświetla początkowy układ kart w kolumnach.
+        # Wyświetla początkowy układ kart na planszy gry.
         y_offset = 378
         y_spacing = 30
 
@@ -56,6 +81,7 @@ class GameSetup:
                 y_position = y_offset + row * y_spacing
                 card_label = self.create_card(x_position, y_position, card)
                 self.card_labels.append(card_label)
+                self.update_card_position(card, x_position, y_position)
 
     def display_stock_pile(self):
         # Wyświetla stos kart rezerwowych (niewykorzystane karty).
@@ -66,7 +92,7 @@ class GameSetup:
             self.card_labels.append(card_label)
 
     def reset_game(self):
-        # Resetuje grę, układ kart i talia są od nowa losowane i rozkładane.
+        # Usunięcie wszystkich kart z planszy
         for label in self.card_labels:
             label.place_forget()
         self.card_labels.clear()
@@ -76,19 +102,20 @@ class GameSetup:
 
         columns = self.first_deal.setup_initial_layout()
         errors = self.first_deal.validate_initial_layout()
-        print("Walidacja błędów:", errors)
+
         if errors:
             ignore = messagebox.askyesno(
                 "Błąd układu początkowego",
                 f"Znaleziono błędy:\n{'\n'.join(errors)}\nCzy chcesz kontynuować mimo to?"
             )
-            print("Czy ignorować błędy:", ignore)
-
             if not ignore:
                 return
-
+            
         self.display_initial_deal(columns)
         self.display_stock_pile()
+
+        self.update_lower_stack_areas()
+
 
     def on_card_click(self, event):
         # Obsługuje kliknięcie na kartę (zapamiętuje jej pozycję, jeśli jest odkryta).
@@ -113,15 +140,95 @@ class GameSetup:
             event.widget.place(x=new_x, y=new_y)
             self.start_x = new_x
             self.start_y = new_y
+    
+    def update_lower_stack_areas(self):
+        # Definicja stałych miejsc na dole (placeholdery)
+        placeholder_positions = [
+            {'x': 130, 'y': 378, 'width': 100, 'height': 145},
+            {'x': 270, 'y': 378, 'width': 100, 'height': 145},
+            {'x': 410, 'y': 378, 'width': 100, 'height': 145},
+            {'x': 550, 'y': 378, 'width': 100, 'height': 145},
+            {'x': 690, 'y': 378, 'width': 100, 'height': 145},
+            {'x': 830, 'y': 378, 'width': 100, 'height': 145},
+            {'x': 970, 'y': 378, 'width': 100, 'height': 145},
+        ]
+
+        self.lower_stack_areas = placeholder_positions
+
+        for position in self.card_positions:
+            area = {
+                'x': position['x'],
+                'y': position['y'],
+                'width': position['width'],
+                'height': position['height'],
+                'card': position['card']
+            }
+            self.lower_stack_areas.append(area)
 
     def on_card_release(self, event):
-        # Obsługuje zwolnienie karty (sprawdza poprawność ruchu).
+        # Obsługuje zdarzenie zwolnienia karty przez użytkownika po przeciągnięciu.
         if self.selected_card:
-            if self.is_valid_move():
-                self.place_in_column(event.x, event.y)
-            else:
-                event.widget.place(x=self.original_x, y=self.original_y)
+            card_x = event.widget.winfo_x()
+            card_y = event.widget.winfo_y()
+            card_width = event.widget.winfo_width()
+            card_height = event.widget.winfo_height()
+
+            card_rect = {'x': card_x, 'y': card_y, 'width': card_width, 'height': card_height}
+
+            collision_found = False
+
+            for area in self.lower_stack_areas:
+                if 'card' in area and area['card'] == self.selected_card:
+                    continue
+                if self.rectangles_overlap(card_rect, area):
+                    collision_found = True
+                    print('true')
+                    break
+
+            if not collision_found:
+                print('false')
+
+            self.lower_stack_areas = [
+                area for area in self.lower_stack_areas if 'card' not in area or area['card'] != self.selected_card
+            ]
+
+            new_area = {'x': card_x, 'y': card_y, 'width': card_width, 'height': card_height, 'card': self.selected_card}
+            self.lower_stack_areas.append(new_area)
+            self.update_card_position(self.selected_card, card_x, card_y)
             self.selected_card = None
+    
+    def update_card_position(self, card, x, y):
+        # Usuń starą pozycję karty
+        self.card_positions = [
+            position for position in self.card_positions if position['card'] != card
+        ]
+
+        self.card_positions.append({
+            'card': card,
+            'x': x,
+            'y': y,
+            'width': 100,  
+            'height': 145 
+        })
+
+    def update_column_positions(self, column_index):
+        # Aktualizuje pozycje kart w podanej kolumnie
+        y_offset = 378
+        y_spacing = 30
+        x_position = 131 + column_index * 140
+
+        for row_index, card in enumerate(self.first_deal.columns[column_index]):
+            y_position = y_offset + row_index * y_spacing
+            for label in self.card_labels:
+                if label.card_object == card:
+                    label.place(x=x_position, y=y_position)
+                    break
+
+    def rectangles_overlap(self, rect1, rect2):
+        # Sprawdza, czy dwa prostokąty nachodzą się w osi X i Y
+        overlap_x = rect1['x'] < rect2['x'] + rect2['width'] and rect1['x'] + rect1['width'] > rect2['x']
+        overlap_y = rect1['y'] < rect2['y'] + rect2['height'] and rect1['y'] + rect1['height'] > rect2['y']
+        return overlap_x and overlap_y
 
     def is_valid_move(self):
         # TODO: Sprawdza poprawność ruchu karty.
@@ -130,3 +237,5 @@ class GameSetup:
     def place_in_column(self, x, y):
         # TODO: Umieszcza kartę w odpowiedniej kolumnie po wykonaniu ruchu.
         pass
+    
+   

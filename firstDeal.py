@@ -34,12 +34,10 @@ class FirstDeal:
         errors = []
 
         for col_index, column in enumerate(self.columns):
-            # Sprawdza, czy liczba kart w każdej kolumnie jest poprawna.
             print(f"(Walidacja) Kolumna {col_index + 1}: {len(column)} kart (oczekiwane: {col_index + 1})")
             if len(column) != col_index + 1:
                 errors.append(f"Kolumna {col_index + 1} ma {len(column)} kart zamiast {col_index + 1}.")
 
-        # Sprawdza, czy ostatnia karta w każdej kolumnie jest odkryta.
         for col_index, column in enumerate(self.columns):
             print(
                 f"(Walidacja) Ostatnia karta w kolumnie {col_index + 1}: {'odkryta' if column and column[-1].revealed else 'zakryta'}")

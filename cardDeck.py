@@ -1,3 +1,4 @@
+import os
 from card import Card
 
 class CardDeck:
@@ -9,11 +10,13 @@ class CardDeck:
     def init_deck(self):
         # Tworzy pełną talię 52 kart (4 kolory po 13 figur).
         figures = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king']
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        cards_dir = os.path.join(script_dir, 'resources', 'cards')
         for suit in ['hearts', 'diamonds', 'clubs', 'spades']:
             for idx, figure in enumerate(figures):
                 points = idx + 1 if idx < 10 else 10
-                front_image = f"resources/cards/{figure}_of_{suit}.png"
-                back_image = "resources/cards/behind.png"
+                front_image = os.path.join(cards_dir, f"{figure}_of_{suit}.png")
+                back_image = os.path.join(cards_dir, "behind.png")
                 card = Card(points, f"{figure} of {suit}", front_image, back_image)
                 self.cards.append(card)
 

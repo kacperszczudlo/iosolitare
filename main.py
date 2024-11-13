@@ -1,6 +1,9 @@
+import os
 from tkinter import *
 from PIL import Image, ImageTk
 from gameSetup import GameSetup
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 width, height = 1200, 800
 window = Tk()
@@ -8,7 +11,8 @@ window.title("Pasjans Inzynieria Oprogramowania")
 window.geometry(f"{width}x{height}")
 window.resizable(False, False)
 
-background = Image.open("resources/background.jpg").resize((width, height))
+background_path = os.path.join(script_dir, 'resources', 'background.jpg')
+background = Image.open(background_path).resize((width, height))
 background_image = ImageTk.PhotoImage(background)
 background_label = Label(window, image=background_image)
 background_label.place(x=0, y=0, relwidth=1, relheight=1)

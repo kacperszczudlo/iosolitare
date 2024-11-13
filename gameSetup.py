@@ -1,4 +1,4 @@
-from tkinter import Label, Button
+from tkinter import Label, Button, messagebox
 from PIL import Image, ImageTk
 from cardDeck import CardDeck
 from firstDeal import FirstDeal
@@ -61,12 +61,23 @@ class GameSetup:
         for label in self.card_labels:
             label.place_forget()
         self.card_labels.clear()
-
         self.deck = CardDeck()
         self.deck.shuffle_deck()
-
         self.first_deal = FirstDeal(self.deck)
+
         columns = self.first_deal.setup_initial_layout()
+        errors = self.first_deal.validate_initial_layout()
+        print("Walidacja błędów:", errors)
+        if errors:
+            ignore = messagebox.askyesno(
+                "Błąd układu początkowego",
+                f"Znaleziono błędy:\n{'\n'.join(errors)}\nCzy chcesz kontynuować mimo to?"
+            )
+            print("Czy ignorować błędy:", ignore)
+
+            if not ignore:  
+                return
+
         self.display_initial_deal(columns)
         self.display_stock_pile()
 

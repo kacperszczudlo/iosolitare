@@ -11,7 +11,7 @@ class GameSetup:
         self.card_labels = []
         self.deck = CardDeck()
         self.card_positions = []
-
+        self.columns = [[] for _ in range(7)]
         script_dir = os.path.dirname(os.path.abspath(__file__))
         self.resources_dir = os.path.join(script_dir, 'resources')
         self.cards_dir = os.path.join(self.resources_dir, 'cards')
@@ -92,7 +92,7 @@ class GameSetup:
             self.card_labels.append(card_label)
 
     def reset_game(self):
-        # Usunięcie wszystkich kart z planszy
+    # Usunięcie wszystkich kart z planszy
         for label in self.card_labels:
             label.place_forget()
         self.card_labels.clear()
@@ -100,7 +100,9 @@ class GameSetup:
         self.deck.shuffle_deck()
         self.first_deal = FirstDeal(self.deck)
 
+        # Ustawienie początkowego układu
         columns = self.first_deal.setup_initial_layout()
+        self.columns = columns  # Przechowywanie kolumn
         errors = self.first_deal.validate_initial_layout()
 
         if errors:
@@ -110,27 +112,31 @@ class GameSetup:
             )
             if not ignore:
                 return
-            
+
         self.display_initial_deal(columns)
         self.display_stock_pile()
-
         self.update_lower_stack_areas()
 
 
     def on_card_click(self, event):
-        # Obsługuje kliknięcie na kartę (zapamiętuje jej pozycję, jeśli jest odkryta).
+    # Obsługuje kliknięcie na kartę (zapamiętuje jej pozycję, jeśli jest odkryta).
         self.selected_card = event.widget.card_object
         self.start_x = event.widget.winfo_x()
         self.start_y = event.widget.winfo_y()
         self.original_x = event.widget.winfo_x()
         self.original_y = event.widget.winfo_y()
 
-        # To jest uzywane do odkladania karty
+        # To jest używane do odkładania karty
         self.start_offset_x = event.x
         self.start_offset_y = event.y
 
-        if not self.selected_card.revealed:
-            self.selected_card = None
+        if self.selected_card and self.selected_card.revealed:
+            # Usuń kartę z logicznego stosu
+            for column in self.columns:
+                if self.selected_card in column:
+                    column.remove(self.selected_card)
+                    break
+
 
     def on_card_drag(self, event):
         # Obsługuje przeciąganie karty po planszy.
@@ -166,37 +172,51 @@ class GameSetup:
             self.lower_stack_areas.append(area)
 
     def on_card_release(self, event):
-        # Obsługuje zdarzenie zwolnienia karty przez użytkownika po przeciągnięciu.
+    # Obsługa zwolnienia karty
         if self.selected_card:
             card_x = event.widget.winfo_x()
             card_y = event.widget.winfo_y()
-            card_width = event.widget.winfo_width()
-            card_height = event.widget.winfo_height()
 
-            card_rect = {'x': card_x, 'y': card_y, 'width': card_width, 'height': card_height}
+            # Znajdź docelowy stos na podstawie ostatniej karty w stosach lub placeholdera
+            target_column = None
+            for col_index, column in enumerate(self.columns):
+                if column:  # Sprawdź, czy karta dotyka ostatniej karty w stosie
+                    last_card = column[-1]
+                    last_card_position = next(
+                        (pos for pos in self.card_positions if pos['card'] == last_card), None
+                    )
+                    if last_card_position and self.rectangles_overlap(
+                        {'x': card_x, 'y': card_y, 'width': 100, 'height': 145},
+                        last_card_position
+                    ):
+                        target_column = col_index
+                        break
+                else:  # Jeśli stos jest pusty, sprawdź obszar placeholdera
+                    placeholder_area = self.lower_stack_areas[col_index]
+                    if self.rectangles_overlap(
+                        {'x': card_x, 'y': card_y, 'width': 100, 'height': 145},
+                        placeholder_area
+                    ):
+                        target_column = col_index
+                        break
 
-            collision_found = False
+            # Jeśli znaleziono docelowy stos, przenieś kartę logicznie
+            if target_column is not None:
+                # Dodaj kartę do nowego stosu
+                self.columns[target_column].append(self.selected_card)
 
-            for area in self.lower_stack_areas:
-                if 'card' in area and area['card'] == self.selected_card:
-                    continue
-                if self.rectangles_overlap(card_rect, area):
-                    collision_found = True
-                    print('true')
-                    break
+                # Wyświetl informację w terminalu
+                print(f"Karta odłożona na stos {target_column + 1}")
+            else:
+                # Jeśli karta nie dotyka żadnego stosu ani placeholdera
+                print("Karta nie została odłożona na żaden stos.")
 
-            if not collision_found:
-                print('false')
-
-            self.lower_stack_areas = [
-                area for area in self.lower_stack_areas if 'card' not in area or area['card'] != self.selected_card
-            ]
-
-            new_area = {'x': card_x, 'y': card_y, 'width': card_width, 'height': card_height, 'card': self.selected_card}
-            self.lower_stack_areas.append(new_area)
+            # Zaktualizuj pozycję logiczną karty w pamięci
             self.update_card_position(self.selected_card, card_x, card_y)
+
+            # Zresetuj wybraną kartę
             self.selected_card = None
-    
+ 
     def update_card_position(self, card, x, y):
         # Usuń starą pozycję karty
         self.card_positions = [
@@ -212,17 +232,18 @@ class GameSetup:
         })
 
     def update_column_positions(self, column_index):
-        # Aktualizuje pozycje kart w podanej kolumnie
+    # Aktualizuj pozycje kart w podanej kolumnie
         y_offset = 378
         y_spacing = 30
         x_position = 131 + column_index * 140
 
-        for row_index, card in enumerate(self.first_deal.columns[column_index]):
+        for row_index, card in enumerate(self.columns[column_index]):
             y_position = y_offset + row_index * y_spacing
             for label in self.card_labels:
                 if label.card_object == card:
                     label.place(x=x_position, y=y_position)
                     break
+
 
     def rectangles_overlap(self, rect1, rect2):
         # Sprawdza, czy dwa prostokąty nachodzą się w osi X i Y

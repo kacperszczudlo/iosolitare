@@ -14,7 +14,7 @@ class CardDeck:
         cards_dir = os.path.join(script_dir, 'resources', 'cards')
         for suit in ['hearts', 'diamonds', 'clubs', 'spades']:
             for idx, figure in enumerate(figures):
-                points = idx + 1 if idx < 10 else 10
+                points = idx + 1 if idx < 13 else 13
                 front_image = os.path.join(cards_dir, f"{figure}_of_{suit}.png")
                 back_image = os.path.join(cards_dir, "behind.png")
                 card = Card(points, f"{figure} of {suit}", front_image, back_image)

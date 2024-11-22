@@ -113,6 +113,14 @@ class GameSetup:
         self.display_stock_pile()
         self.update_lower_stack_areas()
 
+    def highlight_card(self, card_label, color):
+        # Dodaje obramowanie wokół karty
+        card_label.config(bd=0, relief="solid", highlightbackground=color, highlightthickness=3)
+
+    def remove_highlight(self, card_label):
+        # Usuwa obramowanie wokół karty
+        card_label.config(bd=0, highlightthickness=0)
+
 
     def on_card_click(self, event):
     # Obsługuje kliknięcie na kartę (zapamiętuje jej pozycję, jeśli jest odkryta).
@@ -132,7 +140,8 @@ class GameSetup:
                 if self.selected_card in column:
                     column.remove(self.selected_card)
                     break
-
+        if not self.selected_card.revealed:
+            self.selected_card = None
 
     def on_card_drag(self, event):
         # Obsługuje przeciąganie karty po planszy.
@@ -142,6 +151,45 @@ class GameSetup:
             event.widget.place(x=new_x, y=new_y)
             self.start_x = new_x
             self.start_y = new_y
+
+            # Sprawdzamy, czy karta nachodzi na inną kartę
+            overlap_detected = False
+            for label in self.card_labels:
+                if label != event.widget and self.rectangles_overlap(
+                        {'x': new_x, 'y': new_y, 'width': 100, 'height': 145},
+                        {'x': label.winfo_x(), 'y': label.winfo_y(), 'width': 100, 'height': 145}):
+                    #Sprawdzenie poprawności ruchu
+                    target_card = label.card_object
+                    target_column_index = self.get_column_index(target_card)
+
+                    if target_card.revealed:
+                        #Jeśli ruch jest poprawny podświetl na zielono
+                        if target_column_index is not None and self.is_valid_move(self.selected_card, target_column_index):
+                            self.highlight_card(event.widget, "green")
+                            overlap_detected = True
+                            break
+                        # Jeśli ruch jest błedny podświetl na czerwono
+                        elif target_column_index is not None and not self.is_valid_move(self.selected_card, target_column_index):
+                            self.highlight_card(event.widget, "red")
+                            overlap_detected = True
+                            break
+                        else:
+                            self.highlight_card(event.widget, "black")
+                            overlap_detected = True
+                            break
+                else:
+                    self.remove_highlight(event.widget)  # Usuwamy podświetlenie, jeśli nie nachodzi
+
+            # Jeśli nie wykryto nachodzenia, możemy ustawić domyślny kolor
+            if not overlap_detected:
+                self.highlight_card(event.widget, "black")  # Ustawiamy czarne obramowanie, gdy nie ma nachodzenia
+
+    def get_column_index(self, card):
+        # Find the column index where the card is located
+        for col_index, column in enumerate(self.columns):
+            if card in column:
+                return col_index
+        return None
 
     def update_lower_stack_areas(self):
         # Definicja stałych miejsc na dole (placeholdery)
@@ -206,6 +254,9 @@ class GameSetup:
             self.update_card_position(self.selected_card, card_x, card_y)
             self.selected_card = None
 
+            # Usuń obramowanie karty
+            self.remove_highlight(event.widget)
+
     def update_card_position(self, card, x, y):
         # Usuń starą pozycję karty
         self.card_positions = [
@@ -256,5 +307,3 @@ class GameSetup:
     def place_in_column(self, x, y):
         # TODO: Umieszcza kartę w odpowiedniej kolumnie po wykonaniu ruchu.
         pass
-    
-   

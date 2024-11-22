@@ -140,9 +140,8 @@ class GameSetup:
                 if self.selected_card in column:
                     column.remove(self.selected_card)
                     break
-
-        # Dodaj obramowanie karty
-        self.highlight_card(event.widget, "black")
+        if not self.selected_card.revealed:
+            self.selected_card = None
 
     def on_card_drag(self, event):
         # Obsługuje przeciąganie karty po planszy.

@@ -10,13 +10,12 @@ def on_card_click(gsetup, event):
     # To jest używane do odkładania karty
     gsetup.start_offset_x = event.x
     gsetup.start_offset_y = event.y
-
-    if gsetup.selected_card and gsetup.selected_card.revealed:
-        # Usuń kartę z logicznego stosu
-        for column in gsetup.columns:
-            if gsetup.selected_card in column:
-                column.remove(gsetup.selected_card)
-                break
+    # if gsetup.selected_card and gsetup.selected_card.revealed:
+    #     # Usuń kartę z logicznego stosu
+    #     for column in gsetup.columns:
+    #         if gsetup.selected_card in column:
+    #             column.remove(gsetup.selected_card)
+    #             break
     if not gsetup.selected_card.revealed:
         gsetup.selected_card = None
 

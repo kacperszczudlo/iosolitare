@@ -34,25 +34,6 @@ class GameSetup:
     {'x': 970, 'y': 153, 'width': 100, 'height': 145},
 ]
 
-    def create_button(self, text, x, y, width, command=None):
-        # Tworzy przycisk w interfejsie użytkownika.
-        button = Button(self.window, text=text, font=("Arial", 12, "bold"), fg="white", bd=0, highlightthickness=0, bg="#5C4033", state="normal", command=command)
-        button.place(x=x, y=y, width=width, height=31)
-
-    def create_label(self, text, x, y, width):
-        # Tworzy etykietę tekstową w interfejsie użytkownika.
-        label = Label(self.window, text=text, font=("Arial", 12, "bold"), fg="white", bd=0, highlightthickness=0, bg="#5C4033")
-        label.place(x=x, y=y, width=width, height=31)
-
-    def create_placeholder(self, x, y):
-        # Umieszcza obraz zastępczy w interfejsie.
-        placeholder_path = os.path.join(self.resources_dir, 'placeholder.png')
-        placeholder_image = Image.open(placeholder_path).resize((100, 145))
-        placeholder_photo = ImageTk.PhotoImage(placeholder_image)
-        placeholder_label = Label(self.window, image=placeholder_photo, bd=0)
-        placeholder_label.image = placeholder_photo
-        placeholder_label.place(x=x, y=y)
-
     def create_card(self, x, y, card):
         # Tworzy i wyświetla kartę na planszy gry.
         card_image_path = os.path.join(self.cards_dir, os.path.basename(card.get_image()))

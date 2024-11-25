@@ -249,8 +249,10 @@ class GameSetup:
                     print(f"Karta odłożona na stos {target_column + 1}")
                 else:
                     print("Nieprawidłowy ruch. Karta nie została przeniesiona.")
+                    event.widget.place(x=self.original_x, y=self.original_y)
             else:
                 print("Karta nie została odłożona na żaden stos.")
+                event.widget.place(x=self.original_x, y=self.original_y)
             self.update_card_position(self.selected_card, card_x, card_y)
             self.selected_card = None
 

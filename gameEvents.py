@@ -65,7 +65,6 @@ def on_card_drag(gsetup, event):
 
 
 def on_card_release(gsetup, event):
-    # Obsługa zwolnienia karty
     if gsetup.selected_card:
         card_x = event.widget.winfo_x()
         card_y = event.widget.winfo_y()
@@ -93,9 +92,17 @@ def on_card_release(gsetup, event):
                     break
 
         if target_column is not None:
-            if is_valid_move(gsetup,gsetup.selected_card, target_column):
+            if is_valid_move(gsetup, gsetup.selected_card, target_column):
                 gsetup.columns[target_column].append(gsetup.selected_card)
+                new_position = gsetup.lower_stack_areas[target_column]['y'] + (len(gsetup.columns[target_column]) - 1) * 30
                 print(f"Karta odłożona na stos {target_column + 1}")
+                gsetup.card_positions.append({
+                    'card': gsetup.selected_card,
+                    'x': gsetup.lower_stack_areas[target_column]['x'],
+                    'y': new_position
+                })
+                event.widget.place(x=gsetup.lower_stack_areas[target_column]['x'],
+                                   y=new_position)
             else:
                 print("Nieprawidłowy ruch. Karta nie została przeniesiona.")
                 event.widget.place(x=gsetup.original_x, y=gsetup.original_y)
@@ -104,9 +111,10 @@ def on_card_release(gsetup, event):
             event.widget.place(x=gsetup.original_x, y=gsetup.original_y)
         update_card_position(gsetup, gsetup.selected_card, card_x, card_y)
         gsetup.selected_card = None
-
-        # Usuń obramowanie karty
         gsetup.game_ui.remove_highlight(event.widget)
+
+
+
 
 
 

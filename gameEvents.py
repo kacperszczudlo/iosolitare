@@ -109,4 +109,47 @@ def on_card_release(gsetup, event):
         gsetup.game_ui.remove_highlight(event.widget)
 
 
+def on_card_double_click(gsetup, event):
+    card = event.widget.card_object
+    if not card.revealed:
+        return
+
+    card_suit = card.figure.split(' ')[-1]  # Pobiera kolor karty (np. 'clubs', 'hearts')
+
+    for i, area in enumerate(gsetup.upper_stack_areas):
+        if area['suit'] == card_suit:  # Dopasowanie koloru do placeholdera
+            # Jeśli placeholder jest pusty, umieszczamy Asa
+            if area.get('card') is None:  # Placeholder jest pusty
+                if card.points == 1:  # Tylko asy mogą zaczynać stos
+                    gsetup.upper_stack_areas[i]['card'] = card
+                    event.widget.place(x=area['x'], y=area['y'])  # Pozycja na ekranie
+                    event.widget.lift()  # Podnosi kartę na wierzch (w warstwie)
+                    print(f"Karta {card.figure} odłożona na stos {i + 1} (placeholder {area}).")
+                    return
+
+            # Jeśli karta pasuje do wierzchniej na stosie (np. 2 na Asa), to dodajemy ją
+            elif gsetup.upper_stack_areas[i]['card'].points == card.points - 1:
+                gsetup.upper_stack_areas[i]['card'] = card
+
+                # Trzymamy karty na stosie w "wirtualnej" kolejności, ale nie zmieniamy ich pozycji na ekranie
+                stacked_cards = gsetup.upper_stack_areas[i].get('stacked_cards', [])
+                stacked_cards.append(card)  # Dodajemy kartę na stos w logice
+                gsetup.upper_stack_areas[i]['stacked_cards'] = stacked_cards  # Zapisujemy karty na stosie
+
+                # Sortowanie kart na stosie w logice gry (od większych do mniejszych)
+                stacked_cards.sort(key=lambda c: c.points, reverse=True)
+
+                # Karta o wyższej wartości (np. 2, 3) powinna być widoczna na wierzchu
+                event.widget.place(x=area['x'], y=area['y'])  # Pozostawienie tej samej pozycji na ekranie
+                event.widget.lift()  # Podnosi kartę na wierzch (w warstwie)
+
+                print(f"Karta {card.figure} odłożona na stos {i + 1} (placeholder {area}).")
+                return
+
+    print(f"Nie można odłożyć karty {card.figure}.")
+
+
+
+
+
 

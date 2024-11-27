@@ -29,13 +29,13 @@ class GameSetup:
     {'x': 970, 'y': 378, 'width': 100, 'height': 145},
 ]
         self.upper_stack_areas = [
-    {'x': 130, 'y': 153, 'width': 100, 'height': 145},
-    {'x': 270, 'y': 153, 'width': 100, 'height': 145},
-    {'x': 550, 'y': 153, 'width': 100, 'height': 145},
-    {'x': 690, 'y': 153, 'width': 100, 'height': 145},
-    {'x': 830, 'y': 153, 'width': 100, 'height': 145},
-    {'x': 970, 'y': 153, 'width': 100, 'height': 145},
-]
+            {'x': 550, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'hearts'},
+            {'x': 690, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'diamonds'},
+            {'x': 830, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'clubs'},
+            {'x': 970, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'spades'},
+        ]
+
+
 
     def reset_game(self):
     # Usunięcie wszystkich kart z planszy
@@ -48,6 +48,14 @@ class GameSetup:
 
         columns = self.first_deal.setup_initial_layout()
         self.columns = columns  # Przechowywanie kolumn
+        self.card_positions = []
+
+        self.upper_stack_areas = [
+            {'x': 550, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'hearts'},
+            {'x': 690, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'diamonds'},
+            {'x': 830, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'clubs'},
+            {'x': 970, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'spades'},
+        ]
         errors = self.first_deal.validate_initial_layout()
 
         if errors:
@@ -58,9 +66,9 @@ class GameSetup:
             if not ignore:
                 return
 
-        game_ui = gameUI.GameUI(self)
-        game_ui.display_initial_deal(columns)
-        game_ui.display_stock_pile()
+        self.game_ui = gameUI.GameUI(self)
+        self.game_ui.display_initial_deal(columns)
+        self.game_ui.display_stock_pile()
 
         self.update_lower_stack_areas()
 

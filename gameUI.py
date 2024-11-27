@@ -48,6 +48,7 @@ class GameUI:
         card_label.bind("<ButtonPress-1>", partial(gameEvents.on_card_click, self.gameSetup))
         card_label.bind("<B1-Motion>", partial(gameEvents.on_card_drag, self.gameSetup))
         card_label.bind("<ButtonRelease-1>", partial(gameEvents.on_card_release, self.gameSetup))
+        card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self.gameSetup))
 
         return card_label
 

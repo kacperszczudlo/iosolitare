@@ -95,6 +95,7 @@ def on_card_release(gsetup, event):
             if is_valid_move(gsetup, gsetup.selected_card, target_column):
                 gsetup.columns[target_column].append(gsetup.selected_card)
                 new_position = gsetup.lower_stack_areas[target_column]['y'] + (len(gsetup.columns[target_column]) - 1) * 30
+                event.widget.lift()
                 print(f"Karta odłożona na stos {target_column + 1}")
                 gsetup.card_positions.append({
                     'card': gsetup.selected_card,

@@ -98,3 +98,20 @@ class GameSetup:
             }
             self.lower_stack_areas.append(area)
 
+    def reveal_previous_card(self, source_column):
+        # Odkrywa kartę, która znajduje się bezpośrednio pod ostatnią odkrytą kartą.
+        if source_column:
+            previous_card = source_column[-1]
+            previous_card.reveal()
+            card_label = next(label for label in self.card_labels if label.card_object == previous_card)
+            card_image_path = os.path.join(self.cards_dir, os.path.basename(previous_card.get_image()))
+            card_image = Image.open(card_image_path).resize((100, 145))
+            card_photo = ImageTk.PhotoImage(card_image)
+            card_label.config(image=card_photo)
+            card_label.image = card_photo  # Zapisanie referencji do obrazu, aby nie został usunięty przez GC
+
+
+
+
+
+

@@ -1,23 +1,29 @@
 from gameLogic import *
 def on_card_click(gsetup, event):
     # Obsługuje kliknięcie na kartę (zapamiętuje jej pozycję, jeśli jest odkryta).
-    gsetup.selected_card = event.widget.card_object
-    gsetup.start_x = event.widget.winfo_x()
-    gsetup.start_y = event.widget.winfo_y()
-    gsetup.original_x = event.widget.winfo_x()
-    gsetup.original_y = event.widget.winfo_y()
+    card = event.widget.card_object
 
-    # To jest używane do odkładania karty
-    gsetup.start_offset_x = event.x
-    gsetup.start_offset_y = event.y
-    # if gsetup.selected_card and gsetup.selected_card.revealed:
-    #     # Usuń kartę z logicznego stosu
-    #     for column in gsetup.columns:
-    #         if gsetup.selected_card in column:
-    #             column.remove(gsetup.selected_card)
-    #             break
-    if not gsetup.selected_card.revealed:
-        gsetup.selected_card = None
+    # Sprawdzenie, czy kliknięta karta jest ostatnią kartą w kolumnie
+    for column in gsetup.columns:
+        if column and column[-1] == card:
+            gsetup.selected_card = card
+            gsetup.start_x = event.widget.winfo_x()
+            gsetup.start_y = event.widget.winfo_y()
+            gsetup.original_x = event.widget.winfo_x()
+            gsetup.original_y = event.widget.winfo_y()
+
+            # To jest używane do odkładania karty
+            gsetup.start_offset_x = event.x
+            gsetup.start_offset_y = event.y
+
+            # Sprawdzenie, czy karta jest odkryta
+            if not gsetup.selected_card.revealed:
+                gsetup.selected_card = None
+
+            return  # Wyjdź z pętli, jeśli karta jest ostatnia i odkryta
+
+    # Jeśli karta nie jest ostatnią kartą w kolumnie lub jest zakryta
+    gsetup.selected_card = None
 
 
 def on_card_drag(gsetup, event):
@@ -37,18 +43,18 @@ def on_card_drag(gsetup, event):
                     {'x': label.winfo_x(), 'y': label.winfo_y(), 'width': 100, 'height': 145}):
                 # Sprawdzenie poprawności ruchu
                 target_card = label.card_object
-                target_column_index = get_column_index(gsetup,target_card)
+                target_column_index = get_column_index(gsetup, target_card)
 
                 if target_card.revealed:
                     # Jeśli ruch jest poprawny podświetl na zielono
-                    if target_column_index is not None and is_valid_move(gsetup,gsetup.selected_card,
-                                                                                target_column_index):
+                    if target_column_index is not None and is_valid_move(gsetup, gsetup.selected_card,
+                                                                         target_column_index):
                         gsetup.game_ui.highlight_card(event.widget, "green")
                         overlap_detected = True
                         break
-                    # Jeśli ruch jest błedny podświetl na czerwono
-                    elif target_column_index is not None and not is_valid_move(gsetup,gsetup.selected_card,
-                                                                                      target_column_index):
+                    # Jeśli ruch jest błędny podświetl na czerwono
+                    elif target_column_index is not None and not is_valid_move(gsetup, gsetup.selected_card,
+                                                                               target_column_index):
                         gsetup.game_ui.highlight_card(event.widget, "red")
                         overlap_detected = True
                         break
@@ -62,6 +68,7 @@ def on_card_drag(gsetup, event):
         # Jeśli nie wykryto nachodzenia, możemy ustawić domyślny kolor
         if not overlap_detected:
             gsetup.game_ui.highlight_card(event.widget, "black")  # Ustawiamy czarne obramowanie, gdy nie ma nachodzenia
+
 
 
 def on_card_release(gsetup, event):
@@ -96,13 +103,19 @@ def on_card_release(gsetup, event):
         if target_column is not None:
             if is_valid_move(gsetup, gsetup.selected_card, target_column):
                 # Usuwanie karty z poprzedniej kolumny
-                remove_card_from_column(gsetup, gsetup.selected_card)
+                source_column = next((column for column in gsetup.columns if gsetup.selected_card in column), None)
+                if source_column:
+                    source_column.remove(gsetup.selected_card)
+                    # Odkryj kartę, która była pod wybraną kartą, jeśli taka istnieje
+                    if len(source_column) > 0:
+                        gsetup.reveal_previous_card(source_column)
 
                 # Dodanie karty do docelowej kolumny
                 gsetup.columns[target_column].append(gsetup.selected_card)
                 new_position = gsetup.lower_stack_areas[target_column]['y'] + (len(gsetup.columns[target_column]) - 1) * 30
                 event.widget.lift()
                 print(f"Karta odłożona na stos {target_column + 1}")
+                
                 gsetup.card_positions.append({
                     'card': gsetup.selected_card,
                     'x': gsetup.lower_stack_areas[target_column]['x'],
@@ -141,7 +154,12 @@ def on_card_double_click(gsetup, event):
                     event.widget.lift()  # Podnosi kartę na wierzch (w warstwie)
 
                     # Usuń kartę z jej kolumny
-                    remove_card_from_column(gsetup, card)
+                    source_column = next((column for column in gsetup.columns if card in column), None)
+                    if source_column:
+                        source_column.remove(card)
+                        # Odkrywanie karty pod As-em
+                        if len(source_column) > 0:
+                            gsetup.reveal_previous_card(source_column)
 
                     print(f"Karta {card.figure} odłożona na stos {i + 1} (placeholder {area}).")
                     return
@@ -156,7 +174,12 @@ def on_card_double_click(gsetup, event):
                 gsetup.upper_stack_areas[i]['stacked_cards'] = stacked_cards
 
                 # Usuń kartę z jej kolumny
-                remove_card_from_column(gsetup, card)
+                source_column = next((column for column in gsetup.columns if card in column), None)
+                if source_column:
+                    source_column.remove(card)
+                    # Odkrywanie karty pod As-em
+                    if len(source_column) > 0:
+                        gsetup.reveal_previous_card(source_column)
 
                 # Sortowanie kart na stosie w logice gry
                 stacked_cards.sort(key=lambda c: c.points, reverse=True)
@@ -169,6 +192,7 @@ def on_card_double_click(gsetup, event):
                 return
 
     print(f"Nie można odłożyć karty {card.figure}.")
+
 
 
 

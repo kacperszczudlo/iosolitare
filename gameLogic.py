@@ -36,11 +36,17 @@ def is_valid_move(gsetup, card, target_column_index):
         return result
 
     last_card = target_column[-1]
-    valid_color = (card.figure.split(' ')[-1] != last_card.figure.split(' ')[-1])
     valid_rank = (card.points == last_card.points - 1)
+    card_color = card.figure.split(' ')[-1]
+    last_card_color = last_card.figure.split(' ')[-1]
+    red_suits = ['hearts', 'diamonds']
+    black_suits = ['clubs', 'spades']
+    # Sprawdzanie, czy karta i ostatnia karta mają różne kolory (np. pik i trefl lub kier i karo)
+    valid_color = ((card_color in red_suits and last_card_color in black_suits) or
+                   (card_color in black_suits and last_card_color in red_suits))
 
     result = valid_color and valid_rank
-    print(f"Ruch do kolumny {target_column_index + 1}: {'dozwolony' if result else 'zabroniony'}")
+    print(f"Ruch do kolumny {target_column_index + 1}: {'dozwolony' if result else 'zabroniony'} ruch dla karty {card.figure}")
     return result
 
 

@@ -14,6 +14,8 @@ class GameSetup:
         self.card_labels = []
         self.deck = CardDeck()
         self.card_positions = []
+        self.stock_pile = []
+        self.stock_waste = []
         self.game_ui = GameUI(self)
         self.columns = [[] for _ in range(7)]
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -45,6 +47,8 @@ class GameSetup:
         self.deck = CardDeck()
         self.deck.shuffle_deck()
         self.first_deal = FirstDeal(self.deck)
+        self.stock_pile = self.deck.cards[28:]
+        self.stock_waste = []
 
         columns = self.first_deal.setup_initial_layout()
         self.columns = columns  # Przechowywanie kolumn

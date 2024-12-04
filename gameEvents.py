@@ -1,3 +1,6 @@
+from tkinter import Button
+
+import gameLogic
 from gameLogic import *
 def on_card_click(gsetup, event):
     # Obsługuje kliknięcie na kartę (zapamiętuje jej pozycję, jeśli jest odkryta).
@@ -109,4 +112,26 @@ def on_card_release(gsetup, event):
         gsetup.game_ui.remove_highlight(event.widget)
 
 
+def on_stock_pile_click(gsetup, event):
+    if gsetup.stock_pile:
+        # Jeżeli stos kart nie jest pusty, pobierz kartę
+        card = gsetup.stock_pile.pop()
+        card.reveal()
+        gsetup.stock_waste.append(card)
 
+        # Wyświetlenie karty na stosie odpadków obok talii
+        waste_x = 270
+        waste_y = 153
+        gsetup.card_labels.append(gsetup.game_ui.create_card(waste_x, waste_y, card))
+
+        event.widget.place_forget()
+
+        if len(gsetup.stock_pile) == 0:
+            # Pojawienie się przycisku, gdy stos kart jest pusty
+            if not hasattr(gsetup, 'restore_button'):
+                gsetup.restore_button = Button(
+                    gsetup.window,
+                    text="Przełóż karty",
+                    command=lambda: recycle_stock_waste(gsetup)
+                )
+                gsetup.restore_button.place(x=140, y=200)

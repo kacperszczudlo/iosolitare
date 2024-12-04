@@ -39,6 +39,27 @@ def is_valid_move(gsetup, card, target_column_index):
 
     return valid_color and valid_rank
 
+def recycle_stock_waste(gsetup):
+    # Przenoszenie kart z powrotem do stock_pile
+    if gsetup.stock_waste:
+        while gsetup.stock_waste:
+            card = gsetup.stock_waste.pop()
+            card.hide()  # Zakrywanie kart
+            gsetup.stock_pile.append(card)
+
+        for label in gsetup.card_labels[:]:
+            if label.card_object in gsetup.stock_pile:
+                label.place_forget()
+                gsetup.card_labels.remove(label)
+
+        # Ukrywanie przycisku po przeniesieniu kart
+        gsetup.restore_button.place_forget()
+        del gsetup.restore_button
+
+        # Odświeżenie stosu kart
+        gsetup.game_ui.display_stock_pile()
+        print("Karty zostały przełożone z powrotem na stos kart.")
+
 def place_in_column(gsetup, x, y):
     # TODO: Umieszcza kartę w odpowiedniej kolumnie po wykonaniu ruchu.
     pass

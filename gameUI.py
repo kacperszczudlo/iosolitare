@@ -71,6 +71,7 @@ class GameUI:
             card_label = self.create_card(stock_pile_x, stock_pile_y, self.gameSetup.deck.cards[i])
             self.gameSetup.card_labels.append(card_label)
 
+            card_label.bind("<Button-1>", partial(gameEvents.on_stock_pile_click, self.gameSetup))
 
 
     def highlight_card(self, card_label, color):

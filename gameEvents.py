@@ -70,8 +70,18 @@ def on_card_release(gsetup, event):
         card_y = event.widget.winfo_y()
 
         target_column = None
+
+        # Szukanie docelowej kolumny
         for col_index, column in enumerate(gsetup.columns):
-            if column:
+            if not column:  # Jeśli kolumna jest pusta
+                placeholder_area = gsetup.lower_stack_areas[col_index]
+                if rectangles_overlap(
+                        {'x': card_x, 'y': card_y, 'width': 100, 'height': 145},
+                        placeholder_area
+                ):
+                    target_column = col_index
+                    break
+            else:  # Jeśli kolumna zawiera karty
                 last_card = column[-1]
                 last_card_position = next(
                     (pos for pos in gsetup.card_positions if pos['card'] == last_card), None
@@ -82,17 +92,13 @@ def on_card_release(gsetup, event):
                 ):
                     target_column = col_index
                     break
-            else:
-                placeholder_area = gsetup.lower_stack_areas[col_index]
-                if rectangles_overlap(
-                        {'x': card_x, 'y': card_y, 'width': 100, 'height': 145},
-                        placeholder_area
-                ):
-                    target_column = col_index
-                    break
 
         if target_column is not None:
             if is_valid_move(gsetup, gsetup.selected_card, target_column):
+                # Usuwanie karty z poprzedniej kolumny
+                remove_card_from_column(gsetup, gsetup.selected_card)
+
+                # Dodanie karty do docelowej kolumny
                 gsetup.columns[target_column].append(gsetup.selected_card)
                 new_position = gsetup.lower_stack_areas[target_column]['y'] + (len(gsetup.columns[target_column]) - 1) * 30
                 event.widget.lift()
@@ -110,9 +116,12 @@ def on_card_release(gsetup, event):
         else:
             print("Karta nie została odłożona na żaden stos.")
             event.widget.place(x=gsetup.original_x, y=gsetup.original_y)
+
         update_card_position(gsetup, gsetup.selected_card, card_x, card_y)
         gsetup.selected_card = None
         gsetup.game_ui.remove_highlight(event.widget)
+
+
 
 
 def on_card_double_click(gsetup, event):
@@ -130,6 +139,10 @@ def on_card_double_click(gsetup, event):
                     gsetup.upper_stack_areas[i]['card'] = card
                     event.widget.place(x=area['x'], y=area['y'])  # Pozycja na ekranie
                     event.widget.lift()  # Podnosi kartę na wierzch (w warstwie)
+
+                    # Usuń kartę z jej kolumny
+                    remove_card_from_column(gsetup, card)
+
                     print(f"Karta {card.figure} odłożona na stos {i + 1} (placeholder {area}).")
                     return
 
@@ -137,15 +150,18 @@ def on_card_double_click(gsetup, event):
             elif gsetup.upper_stack_areas[i]['card'].points == card.points - 1:
                 gsetup.upper_stack_areas[i]['card'] = card
 
-                # Trzymamy karty na stosie w "wirtualnej" kolejności, ale nie zmieniamy ich pozycji na ekranie
+                # Trzymamy karty na stosie w "wirtualnej" kolejności
                 stacked_cards = gsetup.upper_stack_areas[i].get('stacked_cards', [])
                 stacked_cards.append(card)  # Dodajemy kartę na stos w logice
-                gsetup.upper_stack_areas[i]['stacked_cards'] = stacked_cards  # Zapisujemy karty na stosie
+                gsetup.upper_stack_areas[i]['stacked_cards'] = stacked_cards
 
-                # Sortowanie kart na stosie w logice gry (od większych do mniejszych)
+                # Usuń kartę z jej kolumny
+                remove_card_from_column(gsetup, card)
+
+                # Sortowanie kart na stosie w logice gry
                 stacked_cards.sort(key=lambda c: c.points, reverse=True)
 
-                # Karta o wyższej wartości (np. 2, 3) powinna być widoczna na wierzchu
+                # Karta o wyższej wartości powinna być widoczna na wierzchu
                 event.widget.place(x=area['x'], y=area['y'])  # Pozostawienie tej samej pozycji na ekranie
                 event.widget.lift()  # Podnosi kartę na wierzch (w warstwie)
 
@@ -153,6 +169,7 @@ def on_card_double_click(gsetup, event):
                 return
 
     print(f"Nie można odłożyć karty {card.figure}.")
+
 
 
 

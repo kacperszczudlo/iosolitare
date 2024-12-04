@@ -28,17 +28,50 @@ def rectangles_overlap(rect1, rect2):
 
 
 def is_valid_move(gsetup, card, target_column_index):
-    # Sprawdza poprawność ruchu.
     target_column = gsetup.columns[target_column_index]
-    if not target_column:
-        return True
+
+    if not target_column:  # Jeśli kolumna jest pusta
+        result = card.figure.lower().startswith("king")  # Tylko Król może być umieszczony na pusty stos
+        print(f"Sprawdzanie pustej kolumny: {'dozwolony' if result else 'zabroniony'} ruch dla karty {card.figure}")
+        return result
 
     last_card = target_column[-1]
     valid_color = (card.figure.split(' ')[-1] != last_card.figure.split(' ')[-1])
     valid_rank = (card.points == last_card.points - 1)
 
-    return valid_color and valid_rank
+    result = valid_color and valid_rank
+    print(f"Ruch do kolumny {target_column_index + 1}: {'dozwolony' if result else 'zabroniony'}")
+    return result
+
 
 def place_in_column(gsetup, x, y):
     # TODO: Umieszcza kartę w odpowiedniej kolumnie po wykonaniu ruchu.
     pass
+
+def remove_card_from_column(gsetup, card):
+    # Znajdź i usuń kartę z odpowiedniej kolumny
+    for col_index, column in enumerate(gsetup.columns):
+        if card in column:
+            column.remove(card)  # Usuń kartę z kolumny
+            print(f"Karta {card.figure} usunięta z kolumny {col_index + 1}")
+            break
+    else:
+        print(f"Karta {card.figure} nie została znaleziona w żadnej kolumnie.")
+
+    # Usuń kartę z logiki pozycji
+    gsetup.card_positions = [
+        pos for pos in gsetup.card_positions if pos['card'] != card
+    ]
+    print(f"Pozycja karty {card.figure} usunięta z logiki pozycji.")
+
+    # Debugowanie - wyświetlenie aktualnego stanu kolumn
+    print(f"Aktualny stan kolumn: {[len(col) for col in gsetup.columns]}")
+
+
+
+def remove_card_from_positions(gsetup, card):
+    gsetup.card_positions = [
+        pos for pos in gsetup.card_positions if pos['card'] != card
+    ]
+    print(f"Pozycja karty {card.figure} usunięta z logiki pozycji.")
+

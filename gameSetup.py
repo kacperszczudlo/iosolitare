@@ -38,6 +38,7 @@ class GameSetup:
 
 
     def reset_game(self):
+        print("zresetowano gre")
     # Usunięcie wszystkich kart z planszy
         for label in self.card_labels:
             label.place_forget()
@@ -71,6 +72,7 @@ class GameSetup:
         self.game_ui.display_stock_pile()
 
         self.update_lower_stack_areas()
+
 
     def update_lower_stack_areas(self):
         # Definicja stałych miejsc na dole (placeholdery)

@@ -40,6 +40,18 @@ def on_card_drag(gsetup, event):
 
         # Sprawdzamy, czy karta nachodzi na inną kartę
         overlap_detected = False
+
+        for i, placeholder_area in enumerate(gsetup.lower_stack_areas):
+            if rectangles_overlap(
+                    {'x': new_x, 'y': new_y, 'width': 100, 'height': 145},
+                    placeholder_area
+            ):
+                if gsetup.selected_card.figure.lower().startswith("king"):
+                    print("Król wykryty nad pustym miejscem")
+                    gsetup.game_ui.highlight_card(event.widget, "green")
+                    overlap_detected = True
+                    break
+
         for label in gsetup.card_labels:
             if label != event.widget and rectangles_overlap(
                     {'x': new_x, 'y': new_y, 'width': 100, 'height': 145},
@@ -65,8 +77,6 @@ def on_card_drag(gsetup, event):
                         gsetup.game_ui.highlight_card(event.widget, "black")
                         overlap_detected = True
                         break
-            else:
-                gsetup.game_ui.remove_highlight(event.widget)  # Usuwamy podświetlenie, jeśli nie nachodzi
 
         # Jeśli nie wykryto nachodzenia, możemy ustawić domyślny kolor
         if not overlap_detected:

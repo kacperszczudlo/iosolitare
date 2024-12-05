@@ -16,6 +16,7 @@ class GameSetup:
         self.card_positions = []
         self.stock_pile = []
         self.stock_waste = []
+        self.selected_card = None
         self.game_ui = GameUI(self)
         self.columns = [[] for _ in range(7)]
         script_dir = os.path.dirname(os.path.abspath(__file__))

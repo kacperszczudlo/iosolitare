@@ -25,6 +25,17 @@ def on_card_click(gsetup, event):
 
             return  # Wyjdź z pętli, jeśli karta jest ostatnia i odkryta
 
+        # Sprawdzenie, czy kliknięta karta jest na wierzchu stosu odpadków
+        if gsetup.stock_waste and gsetup.stock_waste[-1] == card:
+            gsetup.selected_card = card
+            gsetup.start_x = event.widget.winfo_x()
+            gsetup.start_y = event.widget.winfo_y()
+            gsetup.original_x = event.widget.winfo_x()
+            gsetup.original_y = event.widget.winfo_y()
+            gsetup.start_offset_x = event.x
+            gsetup.start_offset_y = event.y
+            return
+
     # Jeśli karta nie jest ostatnią kartą w kolumnie lub jest zakryta
     gsetup.selected_card = None
 

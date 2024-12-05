@@ -1,3 +1,6 @@
+from tkinter import Button
+
+import gameLogic
 from gameLogic import *
 def on_card_click(gsetup, event):
     # Obsługuje kliknięcie na kartę (zapamiętuje jej pozycję, jeśli jest odkryta).
@@ -22,6 +25,17 @@ def on_card_click(gsetup, event):
 
             return  # Wyjdź z pętli, jeśli karta jest ostatnia i odkryta
 
+        # Sprawdzenie, czy kliknięta karta jest na wierzchu stosu odpadków
+        if gsetup.stock_waste and gsetup.stock_waste[-1] == card:
+            gsetup.selected_card = card
+            gsetup.start_x = event.widget.winfo_x()
+            gsetup.start_y = event.widget.winfo_y()
+            gsetup.original_x = event.widget.winfo_x()
+            gsetup.original_y = event.widget.winfo_y()
+            gsetup.start_offset_x = event.x
+            gsetup.start_offset_y = event.y
+            return
+
     # Jeśli karta nie jest ostatnią kartą w kolumnie lub jest zakryta
     gsetup.selected_card = None
 
@@ -37,6 +51,18 @@ def on_card_drag(gsetup, event):
 
         # Sprawdzamy, czy karta nachodzi na inną kartę
         overlap_detected = False
+
+        for i, placeholder_area in enumerate(gsetup.lower_stack_areas):
+            if rectangles_overlap(
+                    {'x': new_x, 'y': new_y, 'width': 100, 'height': 145},
+                    placeholder_area
+            ):
+                if gsetup.selected_card.figure.lower().startswith("king"):
+                    print("Król wykryty nad pustym miejscem")
+                    gsetup.game_ui.highlight_card(event.widget, "green")
+                    overlap_detected = True
+                    break
+
         for label in gsetup.card_labels:
             if label != event.widget and rectangles_overlap(
                     {'x': new_x, 'y': new_y, 'width': 100, 'height': 145},
@@ -62,8 +88,6 @@ def on_card_drag(gsetup, event):
                         gsetup.game_ui.highlight_card(event.widget, "black")
                         overlap_detected = True
                         break
-            else:
-                gsetup.game_ui.remove_highlight(event.widget)  # Usuwamy podświetlenie, jeśli nie nachodzi
 
         # Jeśli nie wykryto nachodzenia, możemy ustawić domyślny kolor
         if not overlap_detected:
@@ -135,7 +159,29 @@ def on_card_release(gsetup, event):
         gsetup.game_ui.remove_highlight(event.widget)
 
 
+def on_stock_pile_click(gsetup, event):
+    if gsetup.stock_pile:
+        # Jeżeli stos kart nie jest pusty, pobierz kartę
+        card = gsetup.stock_pile.pop()
+        card.reveal()
+        gsetup.stock_waste.append(card)
 
+        # Wyświetlenie karty na stosie odpadków obok talii
+        waste_x = 270
+        waste_y = 153
+        gsetup.card_labels.append(gsetup.game_ui.create_card(waste_x, waste_y, card))
+
+        event.widget.place_forget()
+
+        if len(gsetup.stock_pile) == 0:
+            # Pojawienie się przycisku, gdy stos kart jest pusty
+            if not hasattr(gsetup, 'restore_button'):
+                gsetup.restore_button = Button(
+                    gsetup.window,
+                    text="Przełóż karty",
+                    command=lambda: recycle_stock_waste(gsetup)
+                )
+                gsetup.restore_button.place(x=140, y=200)
 
 def on_card_double_click(gsetup, event):
     card = event.widget.card_object

@@ -31,15 +31,16 @@ class GameSetup:
     {'x': 970, 'y': 378, 'width': 100, 'height': 145},
 ]
         self.upper_stack_areas = [
-    {'x': 130, 'y': 153, 'width': 100, 'height': 145},
-    {'x': 270, 'y': 153, 'width': 100, 'height': 145},
-    {'x': 550, 'y': 153, 'width': 100, 'height': 145},
-    {'x': 690, 'y': 153, 'width': 100, 'height': 145},
-    {'x': 830, 'y': 153, 'width': 100, 'height': 145},
-    {'x': 970, 'y': 153, 'width': 100, 'height': 145},
-]
+            {'x': 550, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'hearts'},
+            {'x': 690, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'diamonds'},
+            {'x': 830, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'clubs'},
+            {'x': 970, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'spades'},
+        ]
+
+
 
     def reset_game(self):
+        print("zresetowano gre")
     # Usunięcie wszystkich kart z planszy
         for label in self.card_labels:
             label.place_forget()
@@ -52,6 +53,14 @@ class GameSetup:
 
         columns = self.first_deal.setup_initial_layout()
         self.columns = columns  # Przechowywanie kolumn
+        self.card_positions = []
+
+        self.upper_stack_areas = [
+            {'x': 550, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'hearts'},
+            {'x': 690, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'diamonds'},
+            {'x': 830, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'clubs'},
+            {'x': 970, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'spades'},
+        ]
         errors = self.first_deal.validate_initial_layout()
 
         if errors:
@@ -62,11 +71,12 @@ class GameSetup:
             if not ignore:
                 return
 
-        game_ui = gameUI.GameUI(self)
-        game_ui.display_initial_deal(columns)
-        game_ui.display_stock_pile()
+        self.game_ui = gameUI.GameUI(self)
+        self.game_ui.display_initial_deal(columns)
+        self.game_ui.display_stock_pile()
 
         self.update_lower_stack_areas()
+
 
     def update_lower_stack_areas(self):
         # Definicja stałych miejsc na dole (placeholdery)
@@ -91,4 +101,21 @@ class GameSetup:
                 'card': position['card']
             }
             self.lower_stack_areas.append(area)
+
+    def reveal_previous_card(self, source_column):
+        # Odkrywa kartę, która znajduje się bezpośrednio pod ostatnią odkrytą kartą.
+        if source_column:
+            previous_card = source_column[-1]
+            previous_card.reveal()
+            card_label = next(label for label in self.card_labels if label.card_object == previous_card)
+            card_image_path = os.path.join(self.cards_dir, os.path.basename(previous_card.get_image()))
+            card_image = Image.open(card_image_path).resize((100, 145))
+            card_photo = ImageTk.PhotoImage(card_image)
+            card_label.config(image=card_photo)
+            card_label.image = card_photo  # Zapisanie referencji do obrazu, aby nie został usunięty przez GC
+
+
+
+
+
 

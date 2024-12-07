@@ -5,7 +5,9 @@ class Card:
         self.figure = figure
         self.front_image = front_image
         self.back_image = back_image
-        self.revealed = revealed
+        self.revealed = False
+        self.suit = figure.split(' ')[-1]  # Dodajemy atrybut suit
+        self.color = "red" if "hearts" in self.suit or "diamonds" in self.suit else "black"
 
     def reveal(self):
         # Ustawia kartę jako odkrytą (frontem do góry).

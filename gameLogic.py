@@ -90,3 +90,11 @@ def remove_card_from_positions(gsetup, card):
     ]
     print(f"Pozycja karty {card.figure} usunięta z logiki pozycji.")
 
+def is_valid_upper_stack_move(card, area):
+    # Sprawdza, czy karta pasuje do koloru i kolejności
+    if card.figure.split(' ')[-1] != area['suit']:
+        return False
+    if not area['stack']:
+        return card.points == 1  # Tylko asy mogą zaczynać stos
+    return card.points == area['stack'][-1].points + 1
+

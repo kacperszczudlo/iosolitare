@@ -90,3 +90,31 @@ def remove_card_from_positions(gsetup, card):
     ]
     print(f"Pozycja karty {card.figure} usunięta z logiki pozycji.")
 
+
+def find_first_empty_stack(gsetup):
+    for stack in gsetup.upper_stack_areas:
+        if stack['empty']:
+            return stack
+    return None  # Brak pustych stosów
+
+def reset_stack(stack):
+    stack['cards'].clear()
+    stack['empty'] = True
+    print("Stos został zresetowany.")
+
+def print_final_stacks(gsetup):
+    for i, stack in enumerate(gsetup.upper_stack_areas):
+        cards_in_stack = [card.figure for card in stack['cards']]
+        print(f"Stos {i + 1}: {cards_in_stack}")
+
+
+def is_valid_move_to_stack(gsetup, card, stack):
+    if not stack['cards']:  # Jeśli stos jest pusty
+        return card.points == 1  # Tylko As może być pierwszą kartą
+    last_card = stack['cards'][-1]
+    return last_card.suit == card.suit and last_card.points == card.points - 1
+
+
+
+
+

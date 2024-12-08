@@ -32,13 +32,11 @@ class GameSetup:
     {'x': 970, 'y': 378, 'width': 100, 'height': 145},
 ]
         self.upper_stack_areas = [
-            {'x': 550, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'hearts'},
-            {'x': 690, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'diamonds'},
-            {'x': 830, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'clubs'},
-            {'x': 970, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'spades'},
+            {'x': 550, 'y': 153, 'width': 100, 'height': 145, 'cards': [], 'empty': True},
+            {'x': 690, 'y': 153, 'width': 100, 'height': 145, 'cards': [], 'empty': True},
+            {'x': 830, 'y': 153, 'width': 100, 'height': 145, 'cards': [], 'empty': True},
+            {'x': 970, 'y': 153, 'width': 100, 'height': 145, 'cards': [], 'empty': True},
         ]
-
-
 
     def reset_game(self):
         print("zresetowano gre")
@@ -57,11 +55,12 @@ class GameSetup:
         self.card_positions = []
 
         self.upper_stack_areas = [
-            {'x': 550, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'hearts'},
-            {'x': 690, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'diamonds'},
-            {'x': 830, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'clubs'},
-            {'x': 970, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'spades'},
+            {'x': 550, 'y': 153, 'width': 100, 'height': 145, 'cards': [], 'empty': True},
+            {'x': 690, 'y': 153, 'width': 100, 'height': 145, 'cards': [], 'empty': True},
+            {'x': 830, 'y': 153, 'width': 100, 'height': 145, 'cards': [], 'empty': True},
+            {'x': 970, 'y': 153, 'width': 100, 'height': 145, 'cards': [], 'empty': True},
         ]
+
         errors = self.first_deal.validate_initial_layout()
 
         if errors:

@@ -1,0 +1,14 @@
+Gra opiera się na 52 kartach. Nie ma Jokerów. Są 4 stosy bazowe i 7 kolumn 
+roboczych. Na górnej lewej kupce znajduje się tylko jedna karta, która jest 
+odwrócona przodem i tylko tę kartę możesz położyć na inne. Karty na stosie 
+bazowym muszą być ułożone od najmniejszej do największej (od asa do króla). 
+As w tej grze ma najniższą wartość.
+
+W Klondike możesz układać na sobie tylko kolory naprzemiennie. Czerwony na 
+czarny i na odwrót. W pustym miejscu w polu kolumn możesz położyć jedynie 
+króla bądź kombinację ułożonych kart z królem na spodzie. Celem gry jest 
+spowodowanie, aby wszystkie karty trafiły na stos bazowy.
+
+W trybie punktacji standardowej maksymalnie można zdobyć 760 punktów. 
+Klondike to najpopularniejszy pasjans ze wszystkich i posiada blisko 
+90% szans na zwycięską partię.

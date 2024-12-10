@@ -128,6 +128,8 @@ def on_card_release(gsetup, event):
                     {'x': card_x, 'y': card_y, 'width': 100, 'height': 145},
                     area):
                 if is_valid_upper_stack_move(gsetup.selected_card, area):
+                    gsetup.move_counter += 1  # Zwiększenie licznika ruchów
+                    gsetup.game_ui.update_move_counter(gsetup.move_counter)
                     # Dodanie karty do stosu
                     area['stack'].append(gsetup.selected_card)
                     area['card'] = gsetup.selected_card  # Ustawienie wierzchniej karty
@@ -210,6 +212,8 @@ def on_card_release(gsetup, event):
         if target_column is not None:
             # Sprawdzamy, czy ruch jest prawidłowy
             if is_valid_move(gsetup, gsetup.selected_card, target_column):
+                gsetup.move_counter += 1  # Zwiększenie licznika ruchów
+                gsetup.game_ui.update_move_counter(gsetup.move_counter)
                 # Usuwanie kart z poprzedniej kolumny
                 source_column = next((column for column in gsetup.columns if gsetup.selected_card in column), None)
                 if source_column:
@@ -278,6 +282,8 @@ def on_card_release(gsetup, event):
 
 def on_stock_pile_click(gsetup, event):
     if gsetup.stock_pile:
+        gsetup.move_counter += 1
+        gsetup.game_ui.update_move_counter(gsetup.move_counter)
         # Pobranie karty z wierzchu stosu dobieralnego
         card = gsetup.stock_pile.pop()
         card.reveal()  # Odkrycie karty
@@ -337,6 +343,9 @@ def on_card_double_click(gsetup, event):
 
                     # Usuń kartę z jej kolumny
                     source_column = next((column for column in gsetup.columns if card in column), None)
+
+                    gsetup.move_counter += 1  # Zwiększenie licznika ruchów
+                    gsetup.game_ui.update_move_counter(gsetup.move_counter)
                     if source_column:
                         source_column.remove(card)
                         # Odkrywanie karty pod spodem
@@ -359,6 +368,9 @@ def on_card_double_click(gsetup, event):
 
                 # Usuń kartę z jej kolumny
                 source_column = next((column for column in gsetup.columns if card in column), None)
+
+                gsetup.move_counter += 1  # Zwiększenie licznika ruchów
+                gsetup.game_ui.update_move_counter(gsetup.move_counter)
                 if source_column:
                     source_column.remove(card)
                     # Odkrywanie karty pod spodem

@@ -95,3 +95,7 @@ class GameUI:
         self.timer_label.config(text=time_display)
         self.elapsed_time += 1
         self.gameSetup.window.after(1000, self.update_timer)
+
+    def update_move_counter(self, count):
+        self.move_counter_label = Label(self.gameSetup.window, text=f"Ruchy: {count}", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")
+        self.move_counter_label.place(x=846, y=16, width=119, height=31)

@@ -78,6 +78,7 @@ class GameSetup:
 
         self.update_lower_stack_areas()
 
+        self.game_ui.start_timer()
 
     def update_lower_stack_areas(self):
         # Definicja stałych miejsc na dole (placeholdery)

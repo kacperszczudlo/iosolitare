@@ -47,8 +47,17 @@ def recycle_stock_waste(gsetup):
     if gsetup.stock_waste:
         while gsetup.stock_waste:
             card = gsetup.stock_waste.pop()
+            if any(card in area['stack'] for area in gsetup.upper_stack_areas):
+                continue
             card.hide()  # Zakrywanie kart
             gsetup.stock_pile.append(card)
+
+            # Usunięcie etykiety karty z interfejsu użytkownika
+            for label in gsetup.card_labels[:]:
+                if label.card_object == card:
+                    gsetup.card_labels.remove(label)
+                    label.place_forget()
+                    break
 
         # Ukrywanie przycisku po przeniesieniu kart
         if hasattr(gsetup, 'restore_button'):

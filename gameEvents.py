@@ -282,7 +282,7 @@ def on_card_release(gsetup, event):
 
 def on_stock_pile_click(gsetup, event):
     if gsetup.stock_pile:
-        gsetup.move_counter += 1
+        gsetup.move_counter += 1 # Zwiększenie licznika ruchów
         gsetup.game_ui.update_move_counter(gsetup.move_counter)
         # Pobranie karty z wierzchu stosu dobieralnego
         card = gsetup.stock_pile.pop()
@@ -309,19 +309,21 @@ def on_stock_pile_click(gsetup, event):
                 break
 
         # Sprawdzenie, czy stos dobieralny jest pusty
-        '''if len(gsetup.stock_pile) == 0:
+        if len(gsetup.stock_pile) == 0:
             if not hasattr(gsetup, 'restore_button'):
-                gsetup.restore_button = gsetup.game_ui.create_placeholder(131, 153)
-                gsetup.restore_button.bind("<ButtonPress-1>", lambda e: recycle_stock_waste(gsetup))
-            else:
-                gsetup.restore_button.place(x=131, y=153)'''
+                gsetup.restore_button = Button(
+                    gsetup.window,
+                    command=lambda: recycle_stock_waste(gsetup),
+                    bg="#919191",
+                    bd=0
+                )
+                gsetup.restore_button.place(x=130, y=153, width=101, height=145)
 
         # Wyświetlenie komunikatu w terminalu o pobraniu karty
         print(f"Drew card: {card.figure} of {card.suit}")
 
-    elif gsetup.stock_waste:
-        # Przełożenie kart z powrotem na stos dobieralny
-        recycle_stock_waste(gsetup)
+        '''for i in gsetup.upper_stack_areas:
+            print(i["stack"])'''
 
 
 def on_card_double_click(gsetup, event):

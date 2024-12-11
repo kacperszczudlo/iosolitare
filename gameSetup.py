@@ -16,6 +16,7 @@ class GameSetup:
         self.card_positions = []
         self.stock_pile = []
         self.stock_waste = []
+        self.move_counter = 0
         self.selected_card = None
         self.game_ui = GameUI(self)
         self.columns = [[] for _ in range(7)]
@@ -51,6 +52,7 @@ class GameSetup:
         self.first_deal = FirstDeal(self.deck)
         self.stock_pile = self.deck.cards[28:]
         self.stock_waste = []
+        self.move_counter = 0
 
         columns = self.first_deal.setup_initial_layout()
         self.columns = columns  # Przechowywanie kolumn
@@ -78,6 +80,8 @@ class GameSetup:
 
         self.update_lower_stack_areas()
 
+        self.game_ui.start_timer()
+        self.game_ui.update_move_counter(self.move_counter)
 
     def update_lower_stack_areas(self):
         # Definicja stałych miejsc na dole (placeholdery)

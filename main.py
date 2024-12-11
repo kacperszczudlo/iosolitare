@@ -72,7 +72,7 @@ class PasjansApp:
         user_interface.create_button("Nowa gra", 130, 16, 119, game_setup.reset_game)
         user_interface.create_button("Cofnij", 265, 16, 119)
         user_interface.create_label("Punkty: 1000", 711, 16, 119)
-        user_interface.create_label("Ruchy: 230", 846, 16, 119)
+        user_interface.create_label("Ruchy: 0", 846, 16, 119)
         user_interface.create_label("Czas: 00:00", 981, 16, 119)
         user_interface.create_button("Najlepsze wyniki", 16, 753, 200)
 

@@ -83,4 +83,19 @@ class GameUI:
         # Usuwa obramowanie wokół karty
         card_label.config(bd=0, highlightthickness=0)
 
+    def start_timer(self):
+        self.elapsed_time = 0
+        self.timer_label = Label(self.gameSetup.window, text="Czas: 00:00", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")
+        self.timer_label.place(x=981, y=16, width=119, height=31)
+        self.update_timer()
 
+    def update_timer(self):
+        minutes, seconds = divmod(self.elapsed_time, 60)
+        time_display = f"Czas: {minutes:02}:{seconds:02}"
+        self.timer_label.config(text=time_display)
+        self.elapsed_time += 1
+        self.gameSetup.window.after(1000, self.update_timer)
+
+    def update_move_counter(self, count):
+        self.move_counter_label = Label(self.gameSetup.window, text=f"Ruchy: {count}", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")
+        self.move_counter_label.place(x=846, y=16, width=119, height=31)

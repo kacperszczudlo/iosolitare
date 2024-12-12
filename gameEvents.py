@@ -1,14 +1,10 @@
 from tkinter import Button
 from functools import partial
-import gameLogic
 from gameLogic import *
-
 def on_card_click(gsetup, event):
     card = event.widget.card_object
-
     if not card.revealed:
         return
-
     # Karta na foundation
     for area in gsetup.upper_stack_areas:
         if area['card'] == card:
@@ -127,6 +123,7 @@ def on_card_release(gsetup, event):
                         source_column.remove(gsetup.selected_card)
                         if len(source_column) > 0:
                             gsetup.reveal_previous_card(source_column)
+                            gsetup.game_ui.update_score(5)
                         else:
                             col_index = gsetup.columns.index(source_column)
                             print(f"Column {col_index+1} is now empty.")
@@ -141,7 +138,7 @@ def on_card_release(gsetup, event):
 
                     print(f"Moved card {gsetup.selected_card.figure} to foundation stack ({area['suit']}).")
                     valid_move = True
-
+                    gsetup.game_ui.update_score(10)
                     print("Current state of all foundation stacks:")
                     for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
                         stack_cards = [c.figure for c in stack_area['stack']]
@@ -214,6 +211,7 @@ def on_card_release(gsetup, event):
 
                 if source_column and len(source_column) > 0:
                     gsetup.reveal_previous_card(source_column)
+                    gsetup.game_ui.update_score(5)
 
                 for card in gsetup.moving_cards:
                     c_label = next(l for l in gsetup.card_labels if l.card_object == card)
@@ -223,7 +221,14 @@ def on_card_release(gsetup, event):
 
                 if gsetup.selected_card in gsetup.stock_waste:
                     gsetup.stock_waste.remove(gsetup.selected_card)
-
+                if gsetup.selected_card.foundation:
+                    gsetup.game_ui.update_score(-15)
+                else:
+                    if gsetup.selected_card.moved:
+                        gsetup.game_ui.update_score(-1)
+                    else:
+                        gsetup.game_ui.update_score(5)
+                        gsetup.selected_card.moved = True
                 print(f"Placed card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit} in column {target_column+1}")
                 print(f"Current state of columns: {[len(col) for col in gsetup.columns]}")
             else:
@@ -321,12 +326,14 @@ def on_card_double_click(gsetup, event):
                     source_column.remove(card)
                     if len(source_column) > 0:
                         gsetup.reveal_previous_card(source_column)
+                        gsetup.game_ui.update_score(5)
                     else:
                         col_index = gsetup.columns.index(source_column)
                         print(f"Column {col_index + 1} is now empty.")
                 elif card in gsetup.stock_waste:
                     gsetup.stock_waste.remove(card)
-
+                gsetup.game_ui.update_score(10)
+                card.foundation = True
                 print(f"Moved card {card.figure} to foundation stack ({area['suit']}).")
 
                 print("Current state of all foundation stacks:")
@@ -352,12 +359,13 @@ def on_card_double_click(gsetup, event):
                     source_column.remove(card)
                     if len(source_column) > 0:
                         gsetup.reveal_previous_card(source_column)
+                        gsetup.game_ui.update_score(5)
                     else:
                         col_index = gsetup.columns.index(source_column)
                         print(f"Column {col_index + 1} is now empty.")
                 elif card in gsetup.stock_waste:
                     gsetup.stock_waste.remove(card)
-
+                gsetup.game_ui.update_score(10)
                 print(f"Moved card {card.figure} to foundation stack ({area['suit']}).")
 
                 print("Current state of all foundation stacks:")

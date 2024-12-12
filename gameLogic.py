@@ -66,6 +66,7 @@ def recycle_stock_waste(gsetup):
 
         # Odświeżenie stosu kart
         gsetup.game_ui.display_stock_pile()
+        gsetup.game_ui.update_score(-50)
         print("Recycled stock waste back to stock pile.")
 
 def place_in_column(gsetup, x, y):
@@ -107,3 +108,25 @@ def is_valid_upper_stack_move(card, area):
         return card.points == 1  # Tylko asy mogą zaczynać stos
     return card.points == area['stack'][-1].points + 1
 
+
+def is_game_won(gsetup):
+    print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))
+    print("END GAME DEBUG Ilosc kart w stock_waste: ", len(gsetup.stock_waste))
+    lista = []
+    for col in gsetup.columns:
+        smalllist = []
+        if len(col) == 0:
+            smalllist.append(True)
+        else:
+            for card in col:
+                if card.revealed:
+                    smalllist.append(True)
+                else:
+                    smalllist.append(False)
+        lista.append(smalllist)
+
+    print("END GAME DEBUG lista", lista)
+    print("END GAME DEBUG Check", list(map(lambda x: isinstance(x, type(None)) or all(x), lista)))
+    if len(gsetup.stock_pile) == 0 and len(gsetup.stock_waste) == 0 and all(
+            map(lambda x: isinstance(x, type(None)) or all(x), lista)):
+        print("END GAME DEBUG WYGRANA !!!")

@@ -78,7 +78,7 @@ class GameSetup:
         self.game_ui.display_stock_pile()
 
         self.update_lower_stack_areas()
-
+        self.game_ui.init_score()
         self.game_ui.start_timer()
         self.game_ui.update_move_counter(self.move_counter)
 

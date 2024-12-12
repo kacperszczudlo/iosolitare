@@ -8,6 +8,7 @@ from cardDeck import CardDeck
 from firstDeal import FirstDeal
 import gameEvents
 import copy
+from playsound import playsound
 
 class GameSetup:
     def __init__(self, window):
@@ -40,6 +41,9 @@ class GameSetup:
             {'x': 830, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'clubs', 'stack': []},
             {'x': 970, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'spades', 'stack': []},
         ]
+    
+    def play_sound(self, sound_path):
+        playsound(sound_path)
 
     def reset_game(self):
         print("zresetowano gre")

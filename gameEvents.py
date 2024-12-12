@@ -118,7 +118,7 @@ def on_card_release(gsetup, event):
                 if is_valid_upper_stack_move(gsetup.selected_card, area):
                     # Zapis stanu PRZED zmianą
                     gsetup.save_game_state()
-
+                    gsetup.play_sound(r"C:\Users\kamik\Desktop\PasjansProjekcikPiwerko\iosolitare\resources\flipcard-91468.mp3")
                     gsetup.move_counter += 1
                     gsetup.game_ui.update_move_counter(gsetup.move_counter)
 
@@ -150,6 +150,7 @@ def on_card_release(gsetup, event):
                 break
 
         if valid_move:
+            gsetup.play_sound(r"C:\Users\kamik\Desktop\PasjansProjekcikPiwerko\iosolitare\resources\flipcard-91468.mp3")
             gsetup.selected_card = None
             gsetup.moving_cards = []
             gsetup.game_ui.remove_highlight(event.widget)
@@ -191,7 +192,7 @@ def on_card_release(gsetup, event):
             if is_valid_move(gsetup, gsetup.selected_card, target_column):
                 # Zapis stanu PRZED zmianą, bo ruch jest poprawny
                 gsetup.save_game_state()
-
+                gsetup.play_sound(r"C:\Users\kamik\Desktop\PasjansProjekcikPiwerko\iosolitare\resources\flipcard-91468.mp3")
                 gsetup.move_counter += 1
                 gsetup.game_ui.update_move_counter(gsetup.move_counter)
 
@@ -260,6 +261,7 @@ def on_stock_pile_click(gsetup, event):
         card = gsetup.stock_pile.pop()
         card.reveal()
         gsetup.stock_waste.append(card)
+        gsetup.play_sound(r"C:\Users\kamik\Desktop\PasjansProjekcikPiwerko\iosolitare\resources\flipcard-91468.mp3")
 
         # Najpierw usuń starą etykietę zakrytej karty
         for label in gsetup.card_labels[:]:
@@ -306,6 +308,7 @@ def on_card_double_click(gsetup, event):
             # As na pusty foundation
             if not area['stack'] and card.points == 1:
                 # Ruch poprawny
+                gsetup.play_sound(r"C:\Users\kamik\Desktop\PasjansProjekcikPiwerko\iosolitare\resources\flipcard-91468.mp3")
                 gsetup.save_game_state()
 
                 gsetup.move_counter += 1

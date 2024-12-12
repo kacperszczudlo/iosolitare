@@ -12,6 +12,7 @@ class GameUI:
     def __init__(self, setup):
         self.gameSetup = setup
         self.score = 0
+        self.pause = False
 
     def create_button(self, text, x, y, width, command=None):
         button = Button(self.gameSetup.window, text=text, font=("Arial", 12, "bold"), fg="white", bd=0, highlightthickness=0,
@@ -84,7 +85,8 @@ class GameUI:
         time_display = f"Czas: {minutes:02}:{seconds:02}"
         self.timer_label.config(text=time_display)
         self.elapsed_time += 1
-        if self.elapsed_time % 15 == 0:
+        if self.elapsed_time % 15 == 0 and not self.pause:
+            self.pause = True
             self.update_score(-2)
         self.gameSetup.window.after(1000, self.update_timer)
 
@@ -103,4 +105,5 @@ class GameUI:
         if self.score < 0:
             self.score = 0
         print(f"Zmieniono wartosc pkt o {score}")
+        self.pause = False
         self.score_label.config(text=f"Punkty: {self.score}")

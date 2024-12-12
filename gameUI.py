@@ -26,13 +26,26 @@ class GameUI:
         return label
 
 
-    def create_placeholder(self, x, y):
-        placeholder_path = os.path.join(self.gameSetup.resources_dir, 'placeholder.png')
-        placeholder_image = Image.open(placeholder_path).resize((100, 145))
-        placeholder_photo = ImageTk.PhotoImage(placeholder_image)
+    def create_placeholder(self, x, y, suit=None):
+        if suit:
+            placeholder_path = os.path.join(self.gameSetup.resources_dir, f'{suit}_placeholder.png')
+        else:
+            placeholder_path = os.path.join(self.gameSetup.resources_dir, 'placeholder.png')
+
+        background_path = os.path.join(self.gameSetup.resources_dir, 'background.jpg')
+
+        background_image = Image.open(background_path).resize((100, 145))
+        placeholder_image = Image.open(placeholder_path).resize((100, 145)).convert("RGBA")
+        combined_image = Image.alpha_composite(background_image.convert("RGBA"), placeholder_image)
+
+        placeholder_photo = ImageTk.PhotoImage(combined_image)
+
         placeholder_label = Label(self.gameSetup.window, image=placeholder_photo, bd=0)
         placeholder_label.image = placeholder_photo
         placeholder_label.place(x=x, y=y)
+
+        print(f"Created placeholder for suit {suit} at ({x}, {y})")  # Debugowanie
+        return placeholder_label
 
     def create_card(self, x, y, card):
         card_image_path = os.path.join(self.gameSetup.cards_dir, os.path.basename(card.get_image()))

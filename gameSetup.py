@@ -40,6 +40,15 @@ class GameSetup:
             {'x': 830, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'clubs', 'stack': []},
             {'x': 970, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'spades', 'stack': []},
         ]
+        self.upper_stack_placeholders = []
+        self.initialize_upper_stack_placeholders()
+
+    def initialize_upper_stack_placeholders(self):
+        for area in self.upper_stack_areas:
+            suit = area['suit']
+            placeholder_label = self.game_ui.create_placeholder(area['x'], area['y'], suit=suit)
+            self.upper_stack_placeholders.append(placeholder_label)
+            placeholder_label.place_forget()
 
     def reset_game(self):
         print("zresetowano gre")
@@ -63,6 +72,10 @@ class GameSetup:
             {'x': 830, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'clubs', 'stack': []},
             {'x': 970, 'y': 153, 'width': 100, 'height': 145, 'card': None, 'suit': 'spades', 'stack': []},
         ]
+        for i, area in enumerate(self.upper_stack_areas):
+            placeholder_label = self.upper_stack_placeholders[i]
+            placeholder_label.place(x=area['x'], y=area['y'])
+            placeholder_label.lift()  # Wymuszenie na wierzchu
         errors = self.first_deal.validate_initial_layout()
 
         if errors:

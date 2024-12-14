@@ -25,6 +25,7 @@ class GameSetup:
         script_dir = os.path.dirname(os.path.abspath(__file__))
         self.resources_dir = os.path.join(script_dir, 'resources')
         self.cards_dir = os.path.join(self.resources_dir, 'cards')
+        self.preloaded_images = self.preload_images()
         self.lower_stack_areas = [
             {'x': 130, 'y': 378, 'width': 100, 'height': 145},
             {'x': 270, 'y': 378, 'width': 100, 'height': 145},
@@ -42,6 +43,39 @@ class GameSetup:
         ]
         self.upper_stack_placeholders = []
         self.initialize_upper_stack_placeholders()
+
+    def preload_images(self):
+        preloaded = {}
+
+        # Ładowanie obrazów kart
+        for suit in ['hearts', 'diamonds', 'clubs', 'spades']:
+            for figure in ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king']:
+                card_name = f"{figure} of {suit}"  # Klucz w formacie używanym przez Card
+                card_path = os.path.join(self.cards_dir, f"{figure}_of_{suit}.png")
+                preloaded[card_name] = ImageTk.PhotoImage(Image.open(card_path).resize((100, 145)))
+
+        # Ładowanie tyłu kart
+        back_path = os.path.join(self.cards_dir, "behind.png")
+        preloaded["behind"] = ImageTk.PhotoImage(Image.open(back_path).resize((100, 145)))
+
+        # Ładowanie obrazów placeholderów z tłem
+        background_path = os.path.join(self.resources_dir, 'background.jpg')
+        background_image = Image.open(background_path).resize((100, 145)).convert("RGBA")
+
+        for suit in ['hearts', 'diamonds', 'clubs', 'spades']:
+            placeholder_path = os.path.join(self.resources_dir, f'{suit}_placeholder.png')
+            placeholder_image = Image.open(placeholder_path).resize((100, 145)).convert("RGBA")
+            combined_image = Image.alpha_composite(background_image, placeholder_image)
+            preloaded[f"{suit}_placeholder"] = ImageTk.PhotoImage(combined_image)
+
+        # Placeholder ogólny
+        general_placeholder_path = os.path.join(self.resources_dir, 'placeholder.png')
+        placeholder_image = Image.open(general_placeholder_path).resize((100, 145)).convert("RGBA")
+        combined_image = Image.alpha_composite(background_image, placeholder_image)
+        preloaded["general_placeholder"] = ImageTk.PhotoImage(combined_image)
+
+        print("Preładowano wszystkie obrazy, w tym placeholdery z tłem.")
+        return preloaded
 
     def initialize_upper_stack_placeholders(self):
         for area in self.upper_stack_areas:
@@ -123,11 +157,9 @@ class GameSetup:
             previous_card = source_column[-1]
             previous_card.reveal()
             card_label = next(label for label in self.card_labels if label.card_object == previous_card)
-            card_image_path = os.path.join(self.cards_dir, os.path.basename(previous_card.get_image()))
-            card_image = Image.open(card_image_path).resize((100, 145))
-            card_photo = ImageTk.PhotoImage(card_image)
-            card_label.config(image=card_photo)
-            card_label.image = card_photo
+            card_image = self.preloaded_images[previous_card.figure]  # Zamiast ponownie otwierać obraz
+            card_label.config(image=card_image)
+            card_label.image = card_image
 
     def save_game_state(self):
         state = {
@@ -156,7 +188,7 @@ class GameSetup:
         self.card_labels.clear()
 
         from gameUI import GameUI
-        from PIL import Image, ImageTk
+
         from functools import partial
         import gameEvents
         from gameLogic import update_card_position
@@ -165,11 +197,16 @@ class GameSetup:
         self.moving_cards = []
 
         self.game_ui = GameUI(self)
-        for x, y in [
-            (130, 153), (270, 153), (550, 153), (690, 153), (830, 153), (970, 153),
-            (130, 378), (270, 378), (410, 378), (550, 378), (690, 378), (830, 378), (970, 378)
-        ]:
-            self.game_ui.create_placeholder(x, y)
+        # Górne stosy - użycie istniejących placeholderów
+        for i, area in enumerate(self.upper_stack_areas):
+            placeholder_label = self.upper_stack_placeholders[i]
+            placeholder_label.place(x=area['x'], y=area['y'])
+            placeholder_label.lift()  # Podnieś placeholder na wierzch
+
+        # Dolne stosy - placeholdery dla pustych kolumn
+        for area in self.lower_stack_areas:
+            placeholder_label = self.game_ui.create_placeholder(area['x'], area['y'])
+            placeholder_label.place(x=area['x'], y=area['y'])
 
         y_offset = 378
         y_spacing = 30
@@ -183,15 +220,8 @@ class GameSetup:
             if area['stack']:
                 all_cards.extend(area['stack'])
 
-        unique_cards = []
-        seen_cards = set()
-        for c in all_cards:
-            if c not in seen_cards:
-                seen_cards.add(c)
-                unique_cards.append(c)
-            else:
-                print(f"Warning: Duplicate card detected during restore: {c.figure}")
-        all_cards = unique_cards
+        all_cards = list(set(all_cards))  # Usuwa duplikaty bez ręcznego iterowania
+
 
         # Kolumny
         for col_index, column in enumerate(self.columns):

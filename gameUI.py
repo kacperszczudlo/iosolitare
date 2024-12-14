@@ -14,6 +14,7 @@ class GameUI:
         self.score = 0
         self.pause = False
 
+
     def create_button(self, text, x, y, width, command=None):
         button = Button(self.gameSetup.window, text=text, font=("Arial", 12, "bold"), fg="white", bd=0, highlightthickness=0,
                         bg="#5C4033", state="normal", command=command)
@@ -25,36 +26,33 @@ class GameUI:
         label.place(x=x, y=y, width=width, height=31)
         return label
 
-
     def create_placeholder(self, x, y, suit=None):
+        # Pobierz preładowany obraz dla danego suit lub ogólny placeholder
         if suit:
-            placeholder_path = os.path.join(self.gameSetup.resources_dir, f'{suit}_placeholder.png')
+            placeholder_image = self.gameSetup.preloaded_images[f"{suit}_placeholder"]
         else:
-            placeholder_path = os.path.join(self.gameSetup.resources_dir, 'placeholder.png')
+            placeholder_image = self.gameSetup.preloaded_images["general_placeholder"]
 
-        background_path = os.path.join(self.gameSetup.resources_dir, 'background.jpg')
-
-        background_image = Image.open(background_path).resize((100, 145))
-        placeholder_image = Image.open(placeholder_path).resize((100, 145)).convert("RGBA")
-        combined_image = Image.alpha_composite(background_image.convert("RGBA"), placeholder_image)
-
-        placeholder_photo = ImageTk.PhotoImage(combined_image)
-
-        placeholder_label = Label(self.gameSetup.window, image=placeholder_photo, bd=0)
-        placeholder_label.image = placeholder_photo
+        placeholder_label = Label(self.gameSetup.window, image=placeholder_image, bd=0)
+        placeholder_label.image = placeholder_image  # Referencja do obrazu
         placeholder_label.place(x=x, y=y)
+
+        print(f"Stworzono placeholder dla {suit if suit else 'ogólny'} na pozycji ({x}, {y})")
+        return placeholder_label
 
         print(f"Created placeholder for suit {suit} at ({x}, {y})")  # Debugowanie
         return placeholder_label
 
     def create_card(self, x, y, card):
-        card_image_path = os.path.join(self.gameSetup.cards_dir, os.path.basename(card.get_image()))
-        card_image = Image.open(card_image_path).resize((100, 145))
-        card_photo = ImageTk.PhotoImage(card_image)
-        card_label = Label(self.gameSetup.window, image=card_photo, bd=0)
-        card_label.image = card_photo
+        # Pobierz obraz karty z preładowanych obrazów
+        card_image = self.gameSetup.preloaded_images[card.figure] if card.revealed else self.gameSetup.preloaded_images[
+            "behind"]
+        card_label = Label(self.gameSetup.window, image=card_image, bd=0)
+        card_label.image = card_image  # Referencja do obrazu
         card_label.place(x=x, y=y)
         card_label.card_object = card
+
+        # Obsługa zdarzeń
         card_label.bind("<ButtonPress-1>", partial(gameEvents.on_card_click, self.gameSetup))
         card_label.bind("<B1-Motion>", partial(gameEvents.on_card_drag, self.gameSetup))
         card_label.bind("<ButtonRelease-1>", partial(gameEvents.on_card_release, self.gameSetup))

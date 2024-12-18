@@ -67,7 +67,7 @@ class PasjansApp:
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
         game_setup = GameSetup(self.root)
-        user_interface = GameUI(game_setup)
+        user_interface = GameUI(game_setup,self.root)
 
         user_interface.create_button("Nowa gra", 130, 16, 119, game_setup.reset_game)
         user_interface.create_button("Cofnij", 265, 16, 119, game_setup.undo_move)

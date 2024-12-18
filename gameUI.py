@@ -2,17 +2,18 @@ import os
 from functools import partial
 from tkinter import Label, Button, messagebox
 from PIL import Image, ImageTk
-
+import tkinter as tk
 import gameEvents
 from cardDeck import CardDeck
 from firstDeal import FirstDeal
 from gameLogic import *
 
 class GameUI:
-    def __init__(self, setup):
+    def __init__(self, setup,root=None):
         self.gameSetup = setup
         self.score = 0
         self.pause = False
+        self.root = root
 
     def create_button(self, text, x, y, width, command=None):
         button = Button(self.gameSetup.window, text=text, font=("Arial", 12, "bold"), fg="white", bd=0, highlightthickness=0,
@@ -107,3 +108,117 @@ class GameUI:
         print(f"Zmieniono wartosc pkt o {score}")
         self.pause = False
         self.score_label.config(text=f"Punkty: {self.score}")
+
+    def show_centered_box(self):
+
+        self.popup = tk.Toplevel(self.gameSetup.window)
+        self.popup.title("Popup Window")
+        self.popup.overrideredirect(True)
+
+        initial_width = 10
+        initial_height = 10
+        final_width = 400
+        final_height = 400
+        self.popup.geometry(f"{initial_width}x{initial_height}")
+
+        self.popup.grab_set()
+
+
+        self.popup.resizable(False, False)
+
+
+        self.gameSetup.window.update_idletasks()
+        main_x = self.gameSetup.window.winfo_x()
+        main_y = self.gameSetup.window.winfo_y()
+        main_width = self.gameSetup.window.winfo_width()
+        main_height = self.gameSetup.window.winfo_height()
+
+
+
+        x = main_x + (main_width // 2) - (final_width // 2)
+        y = main_y + (main_height // 2) - (final_height // 2)
+
+
+        self.popup.geometry(f"{final_width}x{final_height}+{x}+{y}")
+
+        #Wylacza klikanie rzeczy w tle
+        self.gameSetup.window.attributes('-disabled', True)
+
+        border_frame = tk.Frame(self.popup, bd=5, relief=tk.SUNKEN, highlightbackground="black", highlightcolor="black", highlightthickness=5)
+        border_frame.pack(fill=tk.BOTH, expand=True)
+
+
+        bg_image = Image.open("resources/fireworks.jpg")
+        bg_image = bg_image.resize((final_width, final_height))
+        bg_photo = ImageTk.PhotoImage(bg_image)
+
+        bg_label = tk.Label(border_frame, image=bg_photo)
+        bg_label.image = bg_photo
+        bg_label.place(relwidth=1, relheight=1)
+
+        # Zawartosc okienka
+        label = Label(border_frame, text="Tu beda wyniki", font=("Arial", 12, "bold"), fg="white", bd=0,
+                      highlightthickness=0,
+                      bg="#5C4033")
+        label.pack(pady=20)
+
+        label = Label(border_frame, text=f"Czas: {self.elapsed_time} sekundy", font=("Arial", 12, "bold"), fg="white", bd=0,
+                      highlightthickness=0,
+                      bg="#5C4033")
+        label.pack(pady=20)
+
+        label = Label(border_frame, text=f"Ruchy: {self.gameSetup.move_counter}", font=("Arial", 12, "bold"),
+                      fg="white", bd=0,
+                      highlightthickness=0,
+                      bg="#5C4033")
+        label.pack(pady=20)
+
+        label = Label(border_frame, text=f"Punkty: {self.score} pkt", font=("Arial", 12, "bold"),
+                      fg="white", bd=0,
+                      highlightthickness=0,
+                      bg="#5C4033")
+        label.pack(pady=20)
+
+        close_button = tk.Button(border_frame, text="Zamknij okno", font=("Arial", 12, "bold"), fg="white", bd=0,
+                        highlightthickness=0,
+                        bg="#5C4033", state="normal",command=lambda: self.close_overlay())
+        close_button.pack(pady=10)
+
+        restart_button = tk.Button(border_frame, text="Nowa gra", font=("Arial", 12, "bold"), fg="white", bd=0,
+                                 highlightthickness=0,
+                                 bg="#5C4033", state="normal", command=lambda: self.restart())
+
+        restart_button.pack(pady=10)
+
+        # Wait until the popup is closed
+        self.popup.geometry(f"{final_width}x{final_height}+{x}+{y}")
+        self.animate_popup(initial_width, initial_height, final_width, final_height, x,y)
+        self.popup.wait_window()
+
+    def close_overlay(self):
+        self.gameSetup.window.attributes('-disabled', False)
+        self.popup.destroy()
+
+    def restart(self):
+        self.gameSetup.window.attributes('-disabled', False)
+        self.popup.destroy()
+        self.gameSetup.reset_game()
+
+
+    def animate_popup(self,initial_width, initial_height, final_width, final_height, x, y):
+        current_width = initial_width
+        current_height = initial_height
+        step_width = (final_width - initial_width) // 10
+        step_height = (final_height - initial_height) // 10
+
+        def step():
+            nonlocal current_width, current_height
+            if current_width < final_width and current_height < final_height:
+                current_width += step_width
+                current_height += step_height
+                self.popup.geometry(f"{current_width}x{current_height}+{x}+{y}")
+                self.popup.after(20, step)
+
+        step()
+
+

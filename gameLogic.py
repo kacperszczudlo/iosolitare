@@ -130,3 +130,33 @@ def is_game_won(gsetup):
     if len(gsetup.stock_pile) == 0 and len(gsetup.stock_waste) == 0 and all(
             map(lambda x: isinstance(x, type(None)) or all(x), lista)):
         print("END GAME DEBUG WYGRANA !!!")
+
+
+def is_game_won(gsetup):
+    #IF DO TESTOW
+    if gsetup.game_ui.score >= 20:
+        return True
+    print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))
+    print("END GAME DEBUG Ilosc kart w stock_waste: ", len(gsetup.stock_waste))
+    lista = []
+    for col in gsetup.columns:
+        smalllist = []
+        if len(col) == 0:
+            smalllist.append(True)
+        else:
+            for card in col:
+                if card.revealed:
+                    smalllist.append(True)
+                else:
+                    smalllist.append(False)
+        lista.append(smalllist)
+
+    print("END GAME DEBUG lista", lista)
+    print("END GAME DEBUG ALL", all(map(lambda x: all(x), lista)))
+    print("END GAME DEBUG ANY", any(map(lambda x: any(x), lista)))
+    print("END GAME DEBUG Check", list(map(lambda x: isinstance(x, type(None)) or all(x), lista)))
+    if len(gsetup.stock_pile) == 0 and len(gsetup.stock_waste) == 0 and all(
+            map(lambda x: isinstance(x, type(None)) or all(x), lista)):
+        return True
+    else:
+        return False

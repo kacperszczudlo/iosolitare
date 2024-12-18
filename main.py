@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 from gameSetup import GameSetup
 from gameUI import GameUI
 
+
 class PasjansApp:
     def __init__(self, root):
         self.root = root
@@ -18,7 +19,6 @@ class PasjansApp:
         self.corona_image_path = os.path.join(self.script_dir, 'resources', 'corona.jpg')
         self.rules_path = os.path.join(self.script_dir, 'resources', 'rules.txt')
 
-        # Obrazy stosów końcowych
         self.hearts_image_path = os.path.join(self.script_dir, 'resources', 'hearts_placeholder.png')
         self.diamonds_image_path = os.path.join(self.script_dir, 'resources', 'diamonds_placeholder.png')
         self.clubs_image_path = os.path.join(self.script_dir, 'resources', 'clubs_placeholder.png')
@@ -29,13 +29,41 @@ class PasjansApp:
         self.game_background_image = ImageTk.PhotoImage(Image.open(self.game_background_path).resize((1200, 800)))
         self.corona_image = ImageTk.PhotoImage(Image.open(self.corona_image_path).resize((200, 300)))
 
-        self.hearts_image = ImageTk.PhotoImage(Image.open(self.hearts_image_path).resize((100, 145)))
-        self.diamonds_image = ImageTk.PhotoImage(Image.open(self.diamonds_image_path).resize((100, 145)))
-        self.clubs_image = ImageTk.PhotoImage(Image.open(self.clubs_image_path).resize((100, 145)))
-        self.spades_image = ImageTk.PhotoImage(Image.open(self.spades_image_path).resize((100, 145)))
+        # Przygotowanie przetworzonych obrazów stosów końcowych
+        self.prepared_foundation_images = self.prepare_foundation_images()
 
         self.current_frame = None
         self.show_menu()
+
+    def prepare_foundation_images(self):
+        """
+        Przygotowuje obrazy dla stosów końcowych (łączy tło z placeholderami).
+        """
+        foundation_positions = [
+            (550, 153, self.hearts_image_path),
+            (690, 153, self.diamonds_image_path),
+            (830, 153, self.clubs_image_path),
+            (970, 153, self.spades_image_path),
+        ]
+        prepared_images = []
+
+        for x, y, image_path in foundation_positions:
+            # Wczytaj obraz tła
+            background = Image.open(self.game_background_path).convert("RGBA")
+            background = background.crop((x, y, x + 100, y + 145))  # Wytnij fragment tła
+
+            # Wczytaj obraz placeholdera
+            image = Image.open(image_path).convert("RGBA")
+            image = image.resize((100, 145), Image.Resampling.LANCZOS)
+
+            # Połącz tło z obrazem placeholdera
+            combined = Image.alpha_composite(background, image)
+
+            # Konwersja do PhotoImage
+            tk_image = ImageTk.PhotoImage(combined)
+            prepared_images.append(tk_image)
+
+        return prepared_images
 
     def show_menu(self):
         if self.current_frame:
@@ -81,34 +109,18 @@ class PasjansApp:
         self.current_frame = Frame(self.root)
         self.current_frame.pack(fill="both", expand=True)
 
-        # Tło gry
         background_label = Label(self.current_frame, image=self.game_background_image)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-        # Wtapianie tła w obraz stosów końcowych
+        # Wyświetlanie przygotowanych obrazów stosów końcowych
         foundation_positions = [
-            (550, 153, self.hearts_image_path),
-            (690, 153, self.diamonds_image_path),
-            (830, 153, self.clubs_image_path),
-            (970, 153, self.spades_image_path),
+            (550, 153),
+            (690, 153),
+            (830, 153),
+            (970, 153),
         ]
 
-        for x, y, image_path in foundation_positions:
-            # Wczytaj obraz tła
-            background = Image.open(self.game_background_path).convert("RGBA")
-            background = background.crop((x, y, x + 100, y + 145))  # Wytnij fragment tła o rozmiarze placeholdera
-
-            # Wczytaj obraz placeholdera z przezroczystością
-            image = Image.open(image_path).convert("RGBA")
-            image = image.resize((100, 145), Image.Resampling.LANCZOS)
-
-            # Połącz obraz placeholdera z fragmentem tła
-            combined = Image.alpha_composite(background, image)
-
-            # Konwersja do Tkinter PhotoImage
-            tk_image = ImageTk.PhotoImage(combined)
-
-            # Wyświetl wynikowy obraz
+        for (x, y), tk_image in zip(foundation_positions, self.prepared_foundation_images):
             label = Label(self.current_frame, image=tk_image, bd=0)
             label.image = tk_image  # Zachowaj referencję do obrazu
             label.place(x=x, y=y)

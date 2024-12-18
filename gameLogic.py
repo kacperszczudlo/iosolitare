@@ -36,7 +36,7 @@ def is_valid_move(gsetup, selected_card, target_column_index):
 
     # Pobieramy wierzchnią kartę z docelowej kolumny
     target_card = target_column[-1]
-    
+    print(f"DEBUG IS VALID MOVE Value punktowe : {target_card.points - 1}, selectedcardcolor : {selected_card.color}, targetcardcolor: {target_card.color}")
     # Sprawdzamy, czy wybrana karta może być przeniesiona na docelową kartę
     return (selected_card.points == target_card.points - 1 and
             ((selected_card.color == "red" and target_card.color == "black") or
@@ -134,8 +134,8 @@ def is_game_won(gsetup):
 
 def is_game_won(gsetup):
     #IF DO TESTOW
-    if gsetup.game_ui.score >= 20:
-        return True
+    # if gsetup.game_ui.score >= 20:
+    #     return True
     print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))
     print("END GAME DEBUG Ilosc kart w stock_waste: ", len(gsetup.stock_waste))
     lista = []

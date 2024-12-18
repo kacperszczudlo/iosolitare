@@ -151,6 +151,8 @@ def is_game_won(gsetup):
             for card in col:
                 if card.revealed:
                     smalllist.append(True)
+                elif card is None:
+                    smalllist.append(True)
                 else:
                     smalllist.append(False)
         lista.append(smalllist)

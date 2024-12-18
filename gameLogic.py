@@ -27,17 +27,21 @@ def rectangles_overlap(rect1, rect2):
     return overlap_x and overlap_y
 
 def is_valid_move(gsetup, selected_card, target_column_index):
-    # Pobieramy docelową kolumnę
     target_column = gsetup.columns[target_column_index]
 
-    # Jeśli docelowa kolumna jest pusta, sprawdzamy, czy wybrana karta to król
-    if not target_column:
+    if not target_column:  # Target column is empty
         return selected_card.figure.lower().startswith("king")
 
-    # Pobieramy wierzchnią kartę z docelowej kolumny
     target_card = target_column[-1]
-    print(f"DEBUG IS VALID MOVE Value punktowe : {target_card.points - 1}, selectedcardcolor : {selected_card.color}, targetcardcolor: {target_card.color}")
-    # Sprawdzamy, czy wybrana karta może być przeniesiona na docelową kartę
+    print(
+        f"DEBUG: Checking move: {selected_card.figure} ({selected_card.id}) to {target_card.figure} ({target_card.id})")
+    # Skip if target_card is the same as selected_card
+    if selected_card == target_card:
+        target_card = gsetup.bugfix_previous_card
+        print(f"TU BYL BUG JUZ NIE MA")
+    else:
+        gsetup.bugfix_previous_card = target_card
+
     return (selected_card.points == target_card.points - 1 and
             ((selected_card.color == "red" and target_card.color == "black") or
              (selected_card.color == "black" and target_card.color == "red")))

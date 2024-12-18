@@ -11,6 +11,7 @@ import copy
 
 class GameSetup:
     def __init__(self, window):
+        self.bugfix_previous_card = None
         self.previous_state = None
         self.window = window
         self.card_labels = []

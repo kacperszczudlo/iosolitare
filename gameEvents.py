@@ -8,7 +8,6 @@ def on_card_click(gsetup, event):
     # Karta na foundation
     for area in gsetup.upper_stack_areas:
         if area['card'] == card:
-            gsetup.selected_card = card
             gsetup.start_x = event.widget.winfo_x()
             gsetup.start_y = event.widget.winfo_y()
             gsetup.original_x = gsetup.start_x
@@ -23,7 +22,6 @@ def on_card_click(gsetup, event):
     for column in gsetup.columns:
         if card in column:
             card_index = column.index(card)
-            gsetup.selected_card = card
             gsetup.start_x = event.widget.winfo_x()
             gsetup.start_y = event.widget.winfo_y()
             gsetup.original_x = gsetup.start_x
@@ -35,7 +33,6 @@ def on_card_click(gsetup, event):
             return
 
     if card in gsetup.stock_waste:
-        gsetup.selected_card = card
         gsetup.start_x = event.widget.winfo_x()
         gsetup.start_y = event.widget.winfo_y()
         gsetup.original_x = gsetup.start_x
@@ -47,6 +44,9 @@ def on_card_click(gsetup, event):
 
 
 def on_card_drag(gsetup, event):
+    target_column_index = None
+    if gsetup.selected_card is None:
+        gsetup.selected_card = next(label.card_object for label in gsetup.card_labels if label == event.widget)
     if gsetup.selected_card:
         for i, card in enumerate(gsetup.moving_cards):
             card_label = next(label for label in gsetup.card_labels if label.card_object == card)
@@ -69,7 +69,8 @@ def on_card_drag(gsetup, event):
                     {'x': gsetup.start_x, 'y': gsetup.start_y, 'width': 100, 'height': 145 + 30*(len(gsetup.moving_cards)-1)},
                     {'x': label.winfo_x(), 'y': label.winfo_y(), 'width': 100, 'height': 145}):
                 target_card = label.card_object
-                target_column_index = get_column_index(gsetup, target_card)
+                if target_column_index == None:
+                    target_column_index = get_column_index(gsetup, target_card)
 
                 if target_card.revealed:
                     if target_column_index is not None and is_valid_move(gsetup, gsetup.selected_card, target_column_index):
@@ -151,9 +152,9 @@ def on_card_release(gsetup, event):
                 break
 
         if valid_move:
-            gsetup.selected_card = None
             gsetup.moving_cards = []
             gsetup.game_ui.remove_highlight(event.widget)
+            gsetup.selected_card = None
             return
 
         # Karta z foundation wyciągnięta i niepoprawnie położona
@@ -187,7 +188,7 @@ def on_card_release(gsetup, event):
                     {'x': card_x, 'y': card_y, 'width':100,'height':145}, last_card_position):
                     target_column = col_index
                     break
-
+        print(f"DEBUG TARGET COLUMN: {target_column} ")
         if target_column is not None:
             if is_valid_move(gsetup, gsetup.selected_card, target_column):
                 # Zapis stanu PRZED zmianą, bo ruch jest poprawny

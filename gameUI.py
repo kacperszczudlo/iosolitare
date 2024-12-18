@@ -105,7 +105,7 @@ class GameUI:
         self.score += score
         if self.score < 0:
             self.score = 0
-        print(f"Zmieniono wartosc pkt o {score}")
+        # print(f"Zmieniono wartosc pkt o {score}")
         self.pause = False
         self.score_label.config(text=f"Punkty: {self.score}")
 

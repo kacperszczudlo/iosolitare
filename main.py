@@ -14,15 +14,15 @@ class PasjansApp:
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
 
         # Ścieżki do obrazów
-        self.menu_background_path = os.path.join(self.script_dir, 'resources', 'menu.jpg')
-        self.game_background_path = os.path.join(self.script_dir, 'resources', 'background.jpg')
-        self.corona_image_path = os.path.join(self.script_dir, 'resources', 'corona.jpg')
+        self.menu_background_path = os.path.join(self.script_dir, 'resources','menu', 'menu.jpg')
+        self.game_background_path = os.path.join(self.script_dir, 'resources','background', 'background.jpg')
+        self.corona_image_path = os.path.join(self.script_dir, 'resources','menu', 'corona.jpg')
         self.rules_path = os.path.join(self.script_dir, 'resources', 'rules.txt')
 
-        self.hearts_image_path = os.path.join(self.script_dir, 'resources', 'hearts_placeholder.png')
-        self.diamonds_image_path = os.path.join(self.script_dir, 'resources', 'diamonds_placeholder.png')
-        self.clubs_image_path = os.path.join(self.script_dir, 'resources', 'clubs_placeholder.png')
-        self.spades_image_path = os.path.join(self.script_dir, 'resources', 'spades_placeholder.png')
+        self.hearts_image_path = os.path.join(self.script_dir, 'resources', 'placeholders', 'hearts_placeholder.png')
+        self.diamonds_image_path = os.path.join(self.script_dir, 'resources', 'placeholders', 'diamonds_placeholder.png')
+        self.clubs_image_path = os.path.join(self.script_dir, 'resources', 'placeholders', 'clubs_placeholder.png')
+        self.spades_image_path = os.path.join(self.script_dir, 'resources', 'placeholders', 'spades_placeholder.png')
 
         # Wczytanie obrazów
         self.menu_background_image = ImageTk.PhotoImage(Image.open(self.menu_background_path).resize((1200, 800)))

@@ -28,7 +28,7 @@ class GameUI:
 
 
     def create_placeholder(self, x, y):
-        placeholder_path = os.path.join(self.gameSetup.resources_dir, 'placeholder.png')
+        placeholder_path = os.path.join(self.gameSetup.resources_dir, 'placeholders', 'placeholder.png')
         placeholder_image = Image.open(placeholder_path).resize((100, 145))
         placeholder_photo = ImageTk.PhotoImage(placeholder_image)
         placeholder_label = Label(self.gameSetup.window, image=placeholder_photo, bd=0)

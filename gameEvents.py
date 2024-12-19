@@ -1,98 +1,111 @@
 from tkinter import Button
-
-import gameLogic
+from functools import partial
 from gameLogic import *
 def on_card_click(gsetup, event):
-    # Obsługuje kliknięcie na kartę (zapamiętuje jej pozycję, jeśli jest odkryta).
     card = event.widget.card_object
-
-    # Sprawdzenie, czy kliknięta karta jest ostatnią kartą w kolumnie
-    for column in gsetup.columns:
-        if column and column[-1] == card:
-            gsetup.selected_card = card
+    if not card.revealed:
+        return
+    # Karta na foundation
+    for area in gsetup.upper_stack_areas:
+        if area['card'] == card:
             gsetup.start_x = event.widget.winfo_x()
             gsetup.start_y = event.widget.winfo_y()
-            gsetup.original_x = event.widget.winfo_x()
-            gsetup.original_y = event.widget.winfo_y()
-
-            # To jest używane do odkładania karty
+            gsetup.original_x = gsetup.start_x
+            gsetup.original_y = gsetup.start_y
             gsetup.start_offset_x = event.x
             gsetup.start_offset_y = event.y
-
-            # Sprawdzenie, czy karta jest odkryta
-            if not gsetup.selected_card.revealed:
-                gsetup.selected_card = None
-
-            return  # Wyjdź z pętli, jeśli karta jest ostatnia i odkryta
-
-        # Sprawdzenie, czy kliknięta karta jest na wierzchu stosu odpadków
-        if gsetup.stock_waste and gsetup.stock_waste[-1] == card:
-            gsetup.selected_card = card
-            gsetup.start_x = event.widget.winfo_x()
-            gsetup.start_y = event.widget.winfo_y()
-            gsetup.original_x = event.widget.winfo_x()
-            gsetup.original_y = event.widget.winfo_y()
-            gsetup.start_offset_x = event.x
-            gsetup.start_offset_y = event.y
+            gsetup.moving_cards = [card]
+            print(f"Selected card {card.figure} from foundation stack ({area['suit']}).")
             return
 
-    # Jeśli karta nie jest ostatnią kartą w kolumnie lub jest zakryta
-    gsetup.selected_card = None
+    # Karta w kolumnie lub stock_waste
+    for column in gsetup.columns:
+        if card in column:
+            card_index = column.index(card)
+            gsetup.start_x = event.widget.winfo_x()
+            gsetup.start_y = event.widget.winfo_y()
+            gsetup.original_x = gsetup.start_x
+            gsetup.original_y = gsetup.start_y
+            gsetup.start_offset_x = event.x
+            gsetup.start_offset_y = event.y
+            gsetup.moving_cards = column[card_index:]
+            print(f"Selected card {card.figure} from column {gsetup.columns.index(column) + 1}.")
+            return
+
+    if card in gsetup.stock_waste:
+        gsetup.start_x = event.widget.winfo_x()
+        gsetup.start_y = event.widget.winfo_y()
+        gsetup.original_x = gsetup.start_x
+        gsetup.original_y = gsetup.start_y
+        gsetup.start_offset_x = event.x
+        gsetup.start_offset_y = event.y
+        gsetup.moving_cards = [card]
+        print(f"Selected card {card.figure} from stock waste.")
 
 
 def on_card_drag(gsetup, event):
-    # Obsługuje przeciąganie karty po planszy.
+    target_column_index = None
+    if gsetup.selected_card is None:
+        try:
+            gsetup.selected_card = next(label.card_object for label in gsetup.card_labels if label == event.widget)
+        except StopIteration:
+            gsetup.selected_card = None
+            return
     if gsetup.selected_card:
-        new_x = event.widget.winfo_x() + (event.x - gsetup.start_offset_x)
-        new_y = event.widget.winfo_y() + (event.y - gsetup.start_offset_y)
-        event.widget.place(x=new_x, y=new_y)
-        gsetup.start_x = new_x
-        gsetup.start_y = new_y
+        for i, card in enumerate(gsetup.moving_cards):
+            card_label = next(label for label in gsetup.card_labels if label.card_object == card)
+            card_label.lift()  # Bring the card to the top
 
-        # Sprawdzamy, czy karta nachodzi na inną kartę
+        delta_x = event.x - gsetup.start_offset_x
+        delta_y = event.y - gsetup.start_offset_y
+
+        for i, card in enumerate(gsetup.moving_cards):
+            card_label = next(label for label in gsetup.card_labels if label.card_object == card)
+            card_label.place(x=gsetup.start_x + delta_x, y=gsetup.start_y + delta_y + i * 30)
+
+        gsetup.start_x += delta_x
+        gsetup.start_y += delta_y
+
         overlap_detected = False
-
-        for i, placeholder_area in enumerate(gsetup.lower_stack_areas):
-            if rectangles_overlap(
-                    {'x': new_x, 'y': new_y, 'width': 100, 'height': 145},
-                    placeholder_area
-            ):
-                if gsetup.selected_card.figure.lower().startswith("king"):
-                    print("Król wykryty nad pustym miejscem")
-                    gsetup.game_ui.highlight_card(event.widget, "green")
-                    overlap_detected = True
-                    break
 
         for label in gsetup.card_labels:
             if label != event.widget and rectangles_overlap(
-                    {'x': new_x, 'y': new_y, 'width': 100, 'height': 145},
+                    {'x': gsetup.start_x, 'y': gsetup.start_y, 'width': 100, 'height': 145 + 30*(len(gsetup.moving_cards)-1)},
                     {'x': label.winfo_x(), 'y': label.winfo_y(), 'width': 100, 'height': 145}):
-                # Sprawdzenie poprawności ruchu
                 target_card = label.card_object
-                target_column_index = get_column_index(gsetup, target_card)
+                if target_column_index == None:
+                    target_column_index = get_column_index(gsetup, target_card)
 
                 if target_card.revealed:
-                    # Jeśli ruch jest poprawny podświetl na zielono
-                    if target_column_index is not None and is_valid_move(gsetup, gsetup.selected_card,
-                                                                         target_column_index):
-                        gsetup.game_ui.highlight_card(event.widget, "green")
+                    if target_column_index is not None and is_valid_move(gsetup, gsetup.selected_card, target_column_index):
+                        for card in gsetup.moving_cards:
+                            c_label = next(l for l in gsetup.card_labels if l.card_object == card)
+                            gsetup.game_ui.highlight_card(c_label, "green")
                         overlap_detected = True
                         break
-                    # Jeśli ruch jest błędny podświetl na czerwono
-                    elif target_column_index is not None and not is_valid_move(gsetup, gsetup.selected_card,
-                                                                               target_column_index):
-                        gsetup.game_ui.highlight_card(event.widget, "red")
-                        overlap_detected = True
-                        break
-                    else:
-                        gsetup.game_ui.highlight_card(event.widget, "black")
+                    elif target_column_index is not None:
+                        for card in gsetup.moving_cards:
+                            c_label = next(l for l in gsetup.card_labels if l.card_object == card)
+                            gsetup.game_ui.highlight_card(c_label, "red")
                         overlap_detected = True
                         break
 
-        # Jeśli nie wykryto nachodzenia, możemy ustawić domyślny kolor
+        for area in gsetup.upper_stack_areas:
+            if rectangles_overlap(
+                    {'x': gsetup.start_x, 'y': gsetup.start_y, 'width': 100, 'height': 145},
+                    area):
+                if is_valid_upper_stack_move(gsetup.selected_card, area):
+                    gsetup.game_ui.highlight_card(event.widget, "green")
+                    overlap_detected = True
+                else:
+                    gsetup.game_ui.highlight_card(event.widget, "red")
+                break
+
         if not overlap_detected:
-            gsetup.game_ui.highlight_card(event.widget, "black")  # Ustawiamy czarne obramowanie, gdy nie ma nachodzenia
-
+            for card in gsetup.moving_cards:
+                c_label = next(l for l in gsetup.card_labels if l.card_object == card)
+                gsetup.game_ui.highlight_card(c_label, "black")
+        print(f"Dragging card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit}")
 
 
 def on_card_release(gsetup, event):
@@ -101,151 +114,280 @@ def on_card_release(gsetup, event):
         card_y = event.widget.winfo_y()
 
         target_column = None
+        valid_move = False
 
-        # Szukanie docelowej kolumny
+        # Foundation
+        for area in gsetup.upper_stack_areas:
+            if rectangles_overlap({'x': card_x, 'y': card_y, 'width': 100, 'height': 145}, area):
+                if is_valid_upper_stack_move(gsetup.selected_card, area):
+                    # Zapis stanu PRZED zmianą
+                    gsetup.save_game_state()
+
+                    gsetup.move_counter += 1
+                    gsetup.game_ui.update_move_counter(gsetup.move_counter)
+
+                    source_column = next((col for col in gsetup.columns if gsetup.selected_card in col), None)
+                    if source_column:
+                        source_column.remove(gsetup.selected_card)
+                        if len(source_column) > 0:
+                            gsetup.reveal_previous_card(source_column)
+                            gsetup.game_ui.update_score(5)
+                        else:
+                            col_index = gsetup.columns.index(source_column)
+                            print(f"Column {col_index+1} is now empty.")
+                    elif gsetup.selected_card in gsetup.stock_waste:
+                        gsetup.stock_waste.remove(gsetup.selected_card)
+
+                    area['stack'].append(gsetup.selected_card)
+                    area['card'] = gsetup.selected_card
+
+                    event.widget.place(x=area['x'], y=area['y'])
+                    event.widget.lift()
+                    if is_game_won(gsetup):
+                        gsetup.game_ui.show_centered_box()
+                    print(f"Moved card {gsetup.selected_card.figure} to foundation stack ({area['suit']}).")
+                    valid_move = True
+                    gsetup.game_ui.update_score(10)
+                    print("Current state of all foundation stacks:")
+                    for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
+                        stack_cards = [c.figure for c in stack_area['stack']]
+                        print(f"Foundation stack {idx} ({stack_area['suit']}): {stack_cards}")
+
+                break
+
+        if valid_move:
+            gsetup.moving_cards = []
+            gsetup.game_ui.remove_highlight(event.widget)
+            gsetup.selected_card = None
+            return
+
+        # Karta z foundation wyciągnięta i niepoprawnie położona
+        for area in gsetup.upper_stack_areas:
+            if gsetup.selected_card in area['stack']:
+                area['stack'].remove(gsetup.selected_card)
+                if len(area['stack']) > 0:
+                    area['card'] = area['stack'][-1]
+                else:
+                    area['card'] = None
+
+                if not valid_move:
+                    event.widget.place(x=area['x'], y=area['y'])
+                    print(f"Invalid move: {gsetup.selected_card.figure} from foundation stack ({area['suit']}).")
+                    gsetup.selected_card = None
+                    gsetup.moving_cards = []
+                    return
+                break
+
+        # Docelowa kolumna
         for col_index, column in enumerate(gsetup.columns):
-            if not column:  # Jeśli kolumna jest pusta
+            if not column:
                 placeholder_area = gsetup.lower_stack_areas[col_index]
-                if rectangles_overlap(
-                        {'x': card_x, 'y': card_y, 'width': 100, 'height': 145},
-                        placeholder_area
-                ):
+                if rectangles_overlap({'x': card_x, 'y': card_y, 'width':100, 'height':145}, placeholder_area):
                     target_column = col_index
                     break
-            else:  # Jeśli kolumna zawiera karty
+            else:
                 last_card = column[-1]
-                last_card_position = next(
-                    (pos for pos in gsetup.card_positions if pos['card'] == last_card), None
-                )
+                last_card_position = next((pos for pos in gsetup.card_positions if pos['card']==last_card), None)
                 if last_card_position and rectangles_overlap(
-                        {'x': card_x, 'y': card_y, 'width': 100, 'height': 145},
-                        last_card_position
-                ):
+                    {'x': card_x, 'y': card_y, 'width':100,'height':145}, last_card_position):
                     target_column = col_index
                     break
-
+        print(f"DEBUG TARGET COLUMN: {target_column} ")
         if target_column is not None:
             if is_valid_move(gsetup, gsetup.selected_card, target_column):
-                # Usuwanie karty z poprzedniej kolumny
+                # Zapis stanu PRZED zmianą, bo ruch jest poprawny
+                gsetup.save_game_state()
+
+                gsetup.move_counter += 1
+                gsetup.game_ui.update_move_counter(gsetup.move_counter)
+
                 source_column = next((column for column in gsetup.columns if gsetup.selected_card in column), None)
                 if source_column:
-                    source_column.remove(gsetup.selected_card)
-                    # Odkryj kartę, która była pod wybraną kartą, jeśli taka istnieje
-                    if len(source_column) > 0:
-                        gsetup.reveal_previous_card(source_column)
+                    for card in gsetup.moving_cards:
+                        source_column.remove(card)
+                elif gsetup.selected_card in gsetup.stock_waste:
+                    gsetup.stock_waste.remove(gsetup.selected_card)
 
-                # Dodanie karty do docelowej kolumny
-                gsetup.columns[target_column].append(gsetup.selected_card)
-                new_position = gsetup.lower_stack_areas[target_column]['y'] + (len(gsetup.columns[target_column]) - 1) * 30
-                event.widget.lift()
-                print(f"Karta odłożona na stos {target_column + 1}")
-                
-                gsetup.card_positions.append({
-                    'card': gsetup.selected_card,
-                    'x': gsetup.lower_stack_areas[target_column]['x'],
-                    'y': new_position
-                })
-                event.widget.place(x=gsetup.lower_stack_areas[target_column]['x'],
-                                   y=new_position)
+                gsetup.columns[target_column].extend(gsetup.moving_cards)
+                for i, card in enumerate(gsetup.moving_cards):
+                    card_label = next(l for l in gsetup.card_labels if l.card_object == card)
+                    card_label.place(
+                        x=gsetup.lower_stack_areas[target_column]['x'],
+                        y=gsetup.lower_stack_areas[target_column]['y'] +
+                          (len(gsetup.columns[target_column]) - len(gsetup.moving_cards)) * 30 + i * 30
+                    )
+                    card_label.lift()
+
+                if source_column and len(source_column) > 0:
+                    gsetup.reveal_previous_card(source_column)
+                    gsetup.game_ui.update_score(5)
+
+                for card in gsetup.moving_cards:
+                    c_label = next(l for l in gsetup.card_labels if l.card_object == card)
+                    gsetup.game_ui.remove_highlight(c_label)
+
+                gsetup.moving_cards = []
+
+                if gsetup.selected_card in gsetup.stock_waste:
+                    gsetup.stock_waste.remove(gsetup.selected_card)
+                if gsetup.selected_card.foundation:
+                    gsetup.game_ui.update_score(-15)
+                else:
+                    if gsetup.selected_card.moved:
+                        gsetup.game_ui.update_score(-1)
+                    else:
+                        gsetup.game_ui.update_score(5)
+                        gsetup.selected_card.moved = True
+                if is_game_won(gsetup):
+                    gsetup.game_ui.show_centered_box()
+                print(f"Placed card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit} in column {target_column+1}")
+                print(f"Current state of columns: {[len(col) for col in gsetup.columns]}")
             else:
-                print("Nieprawidłowy ruch. Karta nie została przeniesiona.")
-                event.widget.place(x=gsetup.original_x, y=gsetup.original_y)
+                # Ruch niepoprawny
+                for i, card in enumerate(gsetup.moving_cards):
+                    c_label = next(l for l in gsetup.card_labels if l.card_object == card)
+                    c_label.place(x=gsetup.original_x, y=gsetup.original_y + i * 30)
+                    gsetup.game_ui.remove_highlight(c_label)
+
+                print(f"Invalid move: {gsetup.selected_card.figure} of {gsetup.selected_card.suit}")
         else:
-            print("Karta nie została odłożona na żaden stos.")
-            event.widget.place(x=gsetup.original_x, y=gsetup.original_y)
+            # Brak docelowej kolumny
+            for i, card in enumerate(gsetup.moving_cards):
+                c_label = next(l for l in gsetup.card_labels if l.card_object == card)
+                c_label.place(x=gsetup.original_x, y=gsetup.original_y + i * 30)
+                gsetup.game_ui.remove_highlight(c_label)
+
+            print(f"No valid target column for: {gsetup.selected_card.figure} of {gsetup.selected_card.suit}")
 
         update_card_position(gsetup, gsetup.selected_card, card_x, card_y)
         gsetup.selected_card = None
+        gsetup.moving_cards = []
         gsetup.game_ui.remove_highlight(event.widget)
 
 
 def on_stock_pile_click(gsetup, event):
     if gsetup.stock_pile:
-        # Jeżeli stos kart nie jest pusty, pobierz kartę
+        # Ruch poprawny - zapis stanu PRZED dobraniem karty
+        gsetup.save_game_state()
+
+        gsetup.move_counter += 1
+        gsetup.game_ui.update_move_counter(gsetup.move_counter)
+
         card = gsetup.stock_pile.pop()
         card.reveal()
         gsetup.stock_waste.append(card)
 
-        # Wyświetlenie karty na stosie odpadków obok talii
+        # Najpierw usuń starą etykietę zakrytej karty
+        for label in gsetup.card_labels[:]:
+            if label.card_object == card:
+                gsetup.card_labels.remove(label)
+                label.place_forget()
+                break
+
         waste_x = 270
         waste_y = 153
-        gsetup.card_labels.append(gsetup.game_ui.create_card(waste_x, waste_y, card))
+        card_label = gsetup.game_ui.create_card(waste_x, waste_y, card)
+        gsetup.card_labels.append(card_label)
 
-        event.widget.place_forget()
+        card_label.bind("<ButtonPress-1>", partial(on_card_click, gsetup))
+        card_label.bind("<B1-Motion>", partial(on_card_drag, gsetup))
+        card_label.bind("<ButtonRelease-1>", partial(on_card_release, gsetup))
+        card_label.bind("<Double-1>", partial(on_card_double_click, gsetup))
 
         if len(gsetup.stock_pile) == 0:
-            # Pojawienie się przycisku, gdy stos kart jest pusty
             if not hasattr(gsetup, 'restore_button'):
                 gsetup.restore_button = Button(
                     gsetup.window,
-                    text="Przełóż karty",
-                    command=lambda: recycle_stock_waste(gsetup)
+                    command=lambda: recycle_stock_waste(gsetup),
+                    bg="#919191",
+                    bd=0
                 )
-                gsetup.restore_button.place(x=140, y=200)
+                gsetup.restore_button.place(x=130, y=153, width=101, height=145)
+
+        print(f"Drew card: {card.figure} of {card.suit}")
+
+    elif gsetup.stock_waste:
+        recycle_stock_waste(gsetup)
+
 
 def on_card_double_click(gsetup, event):
     card = event.widget.card_object
     if not card.revealed:
         return
 
-    card_suit = card.figure.split(' ')[-1]  # Pobiera kolor karty (np. 'clubs', 'hearts')
+    card_suit = card.figure.split(' ')[-1]
 
     for i, area in enumerate(gsetup.upper_stack_areas):
-        if area['suit'] == card_suit:  # Dopasowanie koloru do placeholdera
-            # Jeśli placeholder jest pusty, umieszczamy Asa
-            if area.get('card') is None:  # Placeholder jest pusty
-                if card.points == 1:  # Tylko asy mogą zaczynać stos
-                    gsetup.upper_stack_areas[i]['card'] = card
-                    event.widget.place(x=area['x'], y=area['y'])  # Pozycja na ekranie
-                    event.widget.lift()  # Podnosi kartę na wierzch (w warstwie)
+        if area['suit'] == card_suit:
+            # As na pusty foundation
+            if not area['stack'] and card.points == 1:
+                # Ruch poprawny
+                gsetup.save_game_state()
 
-                    # Usuń kartę z jej kolumny
-                    source_column = next((column for column in gsetup.columns if card in column), None)
-                    if source_column:
-                        source_column.remove(card)
-                        # Odkrywanie karty pod As-em
-                        if len(source_column) > 0:
-                            gsetup.reveal_previous_card(source_column)
+                gsetup.move_counter += 1
+                gsetup.game_ui.update_move_counter(gsetup.move_counter)
 
-                    print(f"Karta {card.figure} odłożona na stos {i + 1} (placeholder {area}).")
-                    return
+                area['stack'].append(card)
+                area['card'] = card
+                event.widget.place(x=area['x'], y=area['y'])
+                event.widget.lift()
 
-            # Jeśli karta pasuje do wierzchniej na stosie (np. 2 na Asa), to dodajemy ją
-            elif gsetup.upper_stack_areas[i]['card'].points == card.points - 1:
-                gsetup.upper_stack_areas[i]['card'] = card
-
-                # Trzymamy karty na stosie w "wirtualnej" kolejności
-                stacked_cards = gsetup.upper_stack_areas[i].get('stacked_cards', [])
-                stacked_cards.append(card)  # Dodajemy kartę na stos w logice
-                gsetup.upper_stack_areas[i]['stacked_cards'] = stacked_cards
-
-                # Usuń kartę z jej kolumny
                 source_column = next((column for column in gsetup.columns if card in column), None)
                 if source_column:
                     source_column.remove(card)
-                    # Odkrywanie karty pod As-em
                     if len(source_column) > 0:
                         gsetup.reveal_previous_card(source_column)
+                        gsetup.game_ui.update_score(5)
+                    else:
+                        col_index = gsetup.columns.index(source_column)
+                        print(f"Column {col_index + 1} is now empty.")
+                elif card in gsetup.stock_waste:
+                    gsetup.stock_waste.remove(card)
+                gsetup.game_ui.update_score(10)
+                card.foundation = True
+                if is_game_won(gsetup):
+                    gsetup.game_ui.show_centered_box()
+                print(f"Moved card {card.figure} to foundation stack ({area['suit']}).")
 
-                # Sortowanie kart na stosie w logice gry
-                stacked_cards.sort(key=lambda c: c.points, reverse=True)
-
-                # Karta o wyższej wartości powinna być widoczna na wierzchu
-                event.widget.place(x=area['x'], y=area['y'])  # Pozostawienie tej samej pozycji na ekranie
-                event.widget.lift()  # Podnosi kartę na wierzch (w warstwie)
-
-                print(f"Karta {card.figure} odłożona na stos {i + 1} (placeholder {area}).")
+                print("Current state of all foundation stacks:")
+                for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
+                    stack_cards = [c.figure for c in stack_area['stack']]
+                    print(f"Foundation stack {idx} ({stack_area['suit']}): {stack_cards}")
                 return
 
-    print(f"Nie można odłożyć karty {card.figure}.")
+            # Kolejna karta na foundation
+            elif area['stack'] and area['card'].points == card.points - 1:
+                gsetup.save_game_state()
 
+                gsetup.move_counter += 1
+                gsetup.game_ui.update_move_counter(gsetup.move_counter)
 
+                area['stack'].append(card)
+                area['card'] = card
+                event.widget.place(x=area['x'], y=area['y'])
+                event.widget.lift()
 
+                source_column = next((column for column in gsetup.columns if card in column), None)
+                if source_column:
+                    source_column.remove(card)
+                    if len(source_column) > 0:
+                        gsetup.reveal_previous_card(source_column)
+                        gsetup.game_ui.update_score(5)
+                    else:
+                        col_index = gsetup.columns.index(source_column)
+                        print(f"Column {col_index + 1} is now empty.")
+                elif card in gsetup.stock_waste:
+                    gsetup.stock_waste.remove(card)
+                gsetup.game_ui.update_score(10)
+                if is_game_won(gsetup):
+                    gsetup.game_ui.show_centered_box()
+                print(f"Moved card {card.figure} to foundation stack ({area['suit']}).")
 
+                print("Current state of all foundation stacks:")
+                for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
+                    stack_cards = [c.figure for c in stack_area['stack']]
+                    print(f"Foundation stack {idx} ({stack_area['suit']}): {stack_cards}")
+                return
 
-
-
-
-
-
-
+    # Ruch niepoprawny - nie zapisujemy stanu
+    print(f"Cannot move card {card.figure} to any foundation stack.")

@@ -26,50 +26,52 @@ def rectangles_overlap(rect1, rect2):
     overlap_y = rect1['y'] < rect2['y'] + rect2['height'] and rect1['y'] + rect1['height'] > rect2['y']
     return overlap_x and overlap_y
 
-
-def is_valid_move(gsetup, card, target_column_index):
+def is_valid_move(gsetup, selected_card, target_column_index):
     target_column = gsetup.columns[target_column_index]
 
-    if not target_column:  # Jeśli kolumna jest pusta
-        result = card.figure.lower().startswith("king")  # Tylko Król może być umieszczony na pusty stos
-        print(f"Sprawdzanie pustej kolumny: {'dozwolony' if result else 'zabroniony'} ruch dla karty {card.figure}")
-        return result
+    if not target_column:  # Target column is empty
+        return selected_card.figure.lower().startswith("king")
 
-    last_card = target_column[-1]
-    valid_rank = (card.points == last_card.points - 1)
-    card_color = card.figure.split(' ')[-1]
-    last_card_color = last_card.figure.split(' ')[-1]
-    red_suits = ['hearts', 'diamonds']
-    black_suits = ['clubs', 'spades']
-    # Sprawdzanie, czy karta i ostatnia karta mają różne kolory (np. pik i trefl lub kier i karo)
-    valid_color = ((card_color in red_suits and last_card_color in black_suits) or
-                   (card_color in black_suits and last_card_color in red_suits))
+    target_card = target_column[-1]
+    print(
+        f"DEBUG: Checking move: {selected_card.figure} ({selected_card.id}) to {target_card.figure} ({target_card.id})")
+    # Skip if target_card is the same as selected_card
+    if selected_card == target_card:
+        target_card = gsetup.bugfix_previous_card
+        print(f"TU BYL BUG JUZ NIE MA")
+    else:
+        gsetup.bugfix_previous_card = target_card
 
-    result = valid_color and valid_rank
-    print(f"Ruch do kolumny {target_column_index + 1}: {'dozwolony' if result else 'zabroniony'} ruch dla karty {card.figure}")
-    return result
-
+    return (selected_card.points == target_card.points - 1 and
+            ((selected_card.color == "red" and target_card.color == "black") or
+             (selected_card.color == "black" and target_card.color == "red")))
 
 def recycle_stock_waste(gsetup):
-    # Przenoszenie kart z powrotem do stock_pile
+    # Przenoszenie kart z powrotem do stosu dobieralnego
     if gsetup.stock_waste:
         while gsetup.stock_waste:
             card = gsetup.stock_waste.pop()
+            if any(card in area['stack'] for area in gsetup.upper_stack_areas):
+                continue
             card.hide()  # Zakrywanie kart
             gsetup.stock_pile.append(card)
 
-        for label in gsetup.card_labels[:]:
-            if label.card_object in gsetup.stock_pile:
-                label.place_forget()
-                gsetup.card_labels.remove(label)
+            # Usunięcie etykiety karty z interfejsu użytkownika
+            for label in gsetup.card_labels[:]:
+                if label.card_object == card:
+                    gsetup.card_labels.remove(label)
+                    label.place_forget()
+                    break
 
         # Ukrywanie przycisku po przeniesieniu kart
-        gsetup.restore_button.place_forget()
-        del gsetup.restore_button
+        if hasattr(gsetup, 'restore_button'):
+            gsetup.restore_button.place_forget()
+            del gsetup.restore_button
 
         # Odświeżenie stosu kart
         gsetup.game_ui.display_stock_pile()
-        print("Karty zostały przełożone z powrotem na stos kart.")
+        gsetup.game_ui.update_score(-50)
+        print("Recycled stock waste back to stock pile.")
 
 def place_in_column(gsetup, x, y):
     # TODO: Umieszcza kartę w odpowiedniej kolumnie po wykonaniu ruchu.
@@ -102,3 +104,65 @@ def remove_card_from_positions(gsetup, card):
     ]
     print(f"Pozycja karty {card.figure} usunięta z logiki pozycji.")
 
+def is_valid_upper_stack_move(card, area):
+    # Sprawdza, czy karta pasuje do koloru i kolejności
+    if card.figure.split(' ')[-1] != area['suit']:
+        return False
+    if not area['stack']:
+        return card.points == 1  # Tylko asy mogą zaczynać stos
+    return card.points == area['stack'][-1].points + 1
+
+
+def is_game_won(gsetup):
+    print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))
+    print("END GAME DEBUG Ilosc kart w stock_waste: ", len(gsetup.stock_waste))
+    lista = []
+    for col in gsetup.columns:
+        smalllist = []
+        if len(col) == 0:
+            smalllist.append(True)
+        else:
+            for card in col:
+                if card.revealed:
+                    smalllist.append(True)
+                else:
+                    smalllist.append(False)
+        lista.append(smalllist)
+
+    print("END GAME DEBUG lista", lista)
+    print("END GAME DEBUG Check", list(map(lambda x: isinstance(x, type(None)) or all(x), lista)))
+    if len(gsetup.stock_pile) == 0 and len(gsetup.stock_waste) == 0 and all(
+            map(lambda x: isinstance(x, type(None)) or all(x), lista)):
+        print("END GAME DEBUG WYGRANA !!!")
+
+
+def is_game_won(gsetup):
+    #IF DO TESTOW
+    # if gsetup.game_ui.score >= 20:
+    #     return True
+    print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))
+    print("END GAME DEBUG Ilosc kart w stock_waste: ", len(gsetup.stock_waste))
+    lista = []
+    for col in gsetup.columns:
+        smalllist = []
+        if len(col) == 0:
+            smalllist.append(True)
+        else:
+            for card in col:
+                if card.revealed:
+                    smalllist.append(True)
+                elif card is None:
+                    smalllist.append(True)
+                else:
+                    smalllist.append(False)
+        lista.append(smalllist)
+
+    print("END GAME DEBUG lista", lista)
+    print("END GAME DEBUG ALL", all(map(lambda x: all(x), lista)))
+    print("END GAME DEBUG ANY", any(map(lambda x: any(x), lista)))
+    print("END GAME DEBUG Check", list(map(lambda x: isinstance(x, type(None)) or all(x), lista)))
+    if len(gsetup.stock_pile) == 0 and len(gsetup.stock_waste) == 0 and all(
+            map(lambda x: isinstance(x, type(None)) or all(x), lista)):
+        return True
+    else:
+        return False

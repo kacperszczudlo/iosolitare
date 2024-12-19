@@ -46,7 +46,11 @@ def on_card_click(gsetup, event):
 def on_card_drag(gsetup, event):
     target_column_index = None
     if gsetup.selected_card is None:
-        gsetup.selected_card = next(label.card_object for label in gsetup.card_labels if label == event.widget)
+        try:
+            gsetup.selected_card = next(label.card_object for label in gsetup.card_labels if label == event.widget)
+        except StopIteration:
+            gsetup.selected_card = None
+            return
     if gsetup.selected_card:
         for i, card in enumerate(gsetup.moving_cards):
             card_label = next(label for label in gsetup.card_labels if label.card_object == card)

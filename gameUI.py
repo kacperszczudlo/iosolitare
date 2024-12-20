@@ -148,7 +148,7 @@ class GameUI:
         border_frame.pack(fill=tk.BOTH, expand=True)
 
 
-        bg_image = Image.open("resources/fireworks.jpg")
+        bg_image = Image.open("resources/win/fireworks.jpg")
         bg_image = bg_image.resize((final_width, final_height))
         bg_photo = ImageTk.PhotoImage(bg_image)
 

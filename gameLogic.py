@@ -137,7 +137,7 @@ def is_game_won(gsetup):
 
 
 def is_game_won(gsetup):
-    #IF DO TESTOW
+    # IF DO TESTOW
     # if gsetup.game_ui.score >= 20:
     #     return True
     print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))

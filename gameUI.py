@@ -9,7 +9,7 @@ from firstDeal import FirstDeal
 from gameLogic import *
 
 class GameUI:
-    def __init__(self, setup,root=None):
+    def __init__(self, setup, root=None):
         self.gameSetup = setup
         self.score = 0
         self.pause = False
@@ -25,7 +25,6 @@ class GameUI:
                       bg="#5C4033")
         label.place(x=x, y=y, width=width, height=31)
         return label
-
 
     def create_placeholder(self, x, y):
         placeholder_path = os.path.join(self.gameSetup.resources_dir, 'placeholders', 'placeholder.png')
@@ -46,7 +45,6 @@ class GameUI:
         card_label.bind("<ButtonPress-1>", partial(gameEvents.on_card_click, self.gameSetup))
         card_label.bind("<B1-Motion>", partial(gameEvents.on_card_drag, self.gameSetup))
         card_label.bind("<ButtonRelease-1>", partial(gameEvents.on_card_release, self.gameSetup))
-        # card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self.gameSetup))
 
         return card_label
 
@@ -61,7 +59,7 @@ class GameUI:
                 self.gameSetup.card_labels.append(card_label)
                 update_card_position(self.gameSetup, card, x_position, y_position)
 
-    def display_stock_pile(self,wyjebane = []):
+    def display_stock_pile(self, wyjebane=[]):
         stock_pile_x, stock_pile_y = 131, 153
         for i in range(len(self.gameSetup.first_deal.columns) * (len(self.gameSetup.first_deal.columns) + 1) // 2, len(self.gameSetup.deck.cards)):
             if self.gameSetup.deck.cards[i] not in wyjebane:
@@ -69,7 +67,6 @@ class GameUI:
                 card_label = self.create_card(stock_pile_x, stock_pile_y, self.gameSetup.deck.cards[i])
                 self.gameSetup.card_labels.append(card_label)
                 card_label.bind("<Button-1>", partial(gameEvents.on_stock_pile_click, self.gameSetup))
-
 
     def highlight_card(self, card_label, color):
         card_label.config(bd=0, relief="solid", highlightbackground=color, highlightthickness=3)
@@ -102,25 +99,22 @@ class GameUI:
         self.score_label = Label(self.gameSetup.window, text=f"Punkty: 0", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")
         self.score_label.place(x=711, y=16, width=119, height=31)
 
-
     def update_score(self, score):
         self.score += score
         if self.score < 0:
             self.score = 0
-        # print(f"Zmieniono wartosc pkt o {score}")
         self.pause = False
         self.score_label.config(text=f"Punkty: {self.score}")
 
+    
     def show_centered_box(self):
         self.popup = tk.Toplevel(self.gameSetup.window)
         self.popup.title("Popup Window")
         self.popup.overrideredirect(True)
 
-        initial_width = 10
-        initial_height = 10
         final_width = 730
         final_height = 500
-        self.popup.geometry(f"{initial_width}x{initial_height}")
+        self.popup.geometry(f"{final_width}x{final_height}")
 
         self.popup.grab_set()
         self.popup.resizable(False, False)
@@ -136,56 +130,38 @@ class GameUI:
 
         self.popup.geometry(f"{final_width}x{final_height}+{x}+{y}")
 
-        # Wyłącza klikanie rzeczy w tle
         self.gameSetup.window.attributes('-disabled', True)
 
-        # Ramka dla elementów
-        border_frame = tk.Frame(self.popup, bd=5, relief=tk.SUNKEN, highlightbackground="black", highlightcolor="black",
-                                highlightthickness=5)
-        border_frame.grid(row=0, column=0, sticky="nsew")  # Używamy grid() do rozmieszczenia border_frame
+        # Frame for buttons and labels
+        button_frame = tk.Frame(self.popup, bg="#5C4033")
+        button_frame.place(x=0, y=0, relwidth=1, height=80)  # Adjust height to fit frame
 
-        # Zawartość okienka
-        label_1 = Label(border_frame, text="Tu beda wyniki", font=("Arial", 12, "bold"), fg="white", bd=0,
-                        highlightthickness=0, bg="#5C4033")
-        label_1.grid(row=0, column=0, padx=0, pady=10)  # Pierwsza etykieta w siatce
+        # Button contents
+        label_1 = tk.Label(button_frame, text="Tu beda wyniki", font=("Arial", 12, "bold"), fg="white", bg="#5C4033", bd=2, relief="groove")
+        label_1.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
 
-        label_2 = Label(border_frame, text=f"Czas: {self.elapsed_time} sekundy", font=("Arial", 12, "bold"), fg="white",
-                        bd=0, highlightthickness=0, bg="#5C4033")
-        label_2.grid(row=0, column=1, padx=10, pady=10)  # Druga etykieta obok pierwszej
+        label_2 = tk.Label(button_frame, text=f"Czas: {self.elapsed_time} sekundy", font=("Arial", 12, "bold"), fg="white", bg="#5C4033", bd=2, relief="groove")
+        label_2.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
 
-        label_3 = Label(border_frame, text=f"Ruchy: {self.gameSetup.move_counter}", font=("Arial", 12, "bold"),
-                        fg="white", bd=0, highlightthickness=0, bg="#5C4033")
-        label_3.grid(row=0, column=2, padx=10, pady=10)  # Trzecia etykieta obok drugiej
+        label_3 = tk.Label(button_frame, text=f"Ruchy: {self.gameSetup.move_counter}", font=("Arial", 12, "bold"), fg="white", bg="#5C4033", bd=2, relief="groove")
+        label_3.grid(row=0, column=2, padx=5, pady=5, sticky="ew")
 
-        label_4 = Label(border_frame, text=f"Punkty: {self.score} pkt", font=("Arial", 12, "bold"),
-                        fg="white", bd=0, highlightthickness=0, bg="#5C4033")
-        label_4.grid(row=0, column=3, padx=10, pady=10)  # Czwarta etykieta obok trzeciej
+        label_4 = tk.Label(button_frame, text=f"Punkty: {self.score} pkt", font=("Arial", 12, "bold"), fg="white", bg="#5C4033", bd=2, relief="groove")
+        label_4.grid(row=0, column=3, padx=5, pady=5, sticky="ew")
 
-        # Przycisk zamknięcia w prawym górnym rogu (tekst 'X')
-        close_button = tk.Button(border_frame, text="X", font=("Arial", 16, "bold"), fg="white", bd=0,
-                                 highlightthickness=0, bg="#FF5733", state="normal",
-                                 command=lambda: self.close_overlay())
-        close_button.grid(row=0, column=4, padx=10, pady=10, sticky="ne")  # Umieszczamy w prawym górnym rogu
+        restart_button = tk.Button(button_frame, text="Nowa gra", font=("Arial", 12, "bold"), fg="white", bg="#5C4033", bd=2, relief="groove", command=lambda: self.restart())
+        restart_button.grid(row=0, column=4, padx=5, pady=5, sticky="ew")
 
-        # Przycisk restartu
-        restart_button = tk.Button(border_frame, text="Nowa gra", font=("Arial", 12, "bold"), fg="white", bd=0,
-                                   highlightthickness=0, bg="#5C4033", state="normal", command=lambda: self.restart())
-        restart_button.grid(row=1, column=0, columnspan=4,
-                            pady=10)  # Przycisk w nowym wierszu, zajmujący cztery kolumny
+        for i in range(5):
+            button_frame.grid_columnconfigure(i, weight=1)  # Distribute columns evenly
 
-        # Animowany GIF (pod etykietami)
+        # Background GIF
         self.bg_image = ImageTk.PhotoImage(file="resources/skolim/palermo-ezgif.com-resize.gif", format="gif -index 0")
-        self.bg_label = tk.Label(border_frame, image=self.bg_image)
+        self.bg_label = tk.Label(self.popup, image=self.bg_image)
         self.bg_label.image = self.bg_image
-        self.bg_label.grid(row=2, column=0, columnspan=4,
-                           sticky="nsew")  # GIF w nowym wierszu, zajmujący całą szerokość
+        self.bg_label.place(x=0, y=80, relwidth=1, relheight=0.84)  # Adjust y and relheight to fit the frame
 
-        # Zmieniamy na grid dla pozostałych elementów
-        self.popup.grid_rowconfigure(0, weight=1)  # Pozwól na rozszerzanie pierwszego wiersza z etykietami
-        self.popup.grid_rowconfigure(1, weight=1)  # Pozwól na rozszerzanie drugiego wiersza z przyciskami
-        self.popup.grid_rowconfigure(2, weight=3)  # Pozwól na rozszerzanie trzeciego wiersza z GIF-em
-
-        # Animacja GIF-a
+        # Animate GIF
         self.animate_gif("resources/skolim/palermo-ezgif.com-resize.gif")
 
         self.popup.wait_window()
@@ -196,20 +172,22 @@ class GameUI:
             img = Image.open(filepath)
             while True:
                 self.frames.append(ImageTk.PhotoImage(img.copy()))
-                img.seek(len(self.frames))  # Przechodzi do kolejnej klatki
+                img.seek(len(self.frames))
         except EOFError:
             pass
 
         self.current_frame = 0
 
         def update_frame():
-            self.bg_label.config(image=self.frames[self.current_frame])  # Ustawia obrazek na label
+            self.bg_label.config(image=self.frames[self.current_frame])
             self.current_frame = (self.current_frame + 1) % len(self.frames)
-            self.bg_label.after(20, update_frame)  # Szybkość animacji (ms)
+            self.bg_label.after(20, update_frame)
 
         update_frame()
 
+
     def close_overlay(self):
+
         self.gameSetup.window.attributes('-disabled', False)
         self.popup.destroy()
 

@@ -7,6 +7,10 @@ import gameEvents
 from cardDeck import CardDeck
 from firstDeal import FirstDeal
 from gameLogic import *
+import pygame
+import threading
+
+
 
 class GameUI:
     def __init__(self, setup, root=None):
@@ -132,11 +136,10 @@ class GameUI:
 
         self.gameSetup.window.attributes('-disabled', True)
 
-        # Frame for buttons and labels
         button_frame = tk.Frame(self.popup, bg="#5C4033")
         button_frame.place(x=0, y=0, relwidth=1, height=80)  # Adjust height to fit frame
 
-        # Button contents
+
         label_1 = tk.Label(button_frame, text="Tu beda wyniki", font=("Arial", 12, "bold"), fg="white", bg="#5C4033", bd=2, relief="groove")
         label_1.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
 
@@ -155,13 +158,12 @@ class GameUI:
         for i in range(5):
             button_frame.grid_columnconfigure(i, weight=1)  # Distribute columns evenly
 
-        # Background GIF
+
         self.bg_image = ImageTk.PhotoImage(file="resources/skolim/palermo-ezgif.com-resize.gif", format="gif -index 0")
         self.bg_label = tk.Label(self.popup, image=self.bg_image)
         self.bg_label.image = self.bg_image
         self.bg_label.place(x=0, y=80, relwidth=1, relheight=0.84)  # Adjust y and relheight to fit the frame
-
-        # Animate GIF
+        self.play_music("resources/skolim/PALERMO (mp3cut.net).mp3")
         self.animate_gif("resources/skolim/palermo-ezgif.com-resize.gif")
 
         self.popup.wait_window()
@@ -195,6 +197,7 @@ class GameUI:
         self.gameSetup.window.attributes('-disabled', False)
         self.popup.destroy()
         self.gameSetup.reset_game()
+        self.stop_music()
 
 
     def animate_popup(self,initial_width, initial_height, final_width, final_height, x, y):
@@ -213,4 +216,18 @@ class GameUI:
 
         step()
 
+    def play_music(self,file_path):
+        def music():
+            pygame.mixer.init()
+            pygame.mixer.music.load(file_path)
+            pygame.mixer.music.set_volume(1.0)
+            pygame.mixer.music.play(-1)
+            while pygame.mixer.music.get_busy():
+                pygame.time.Clock().tick(10)
+
+        music_thread = threading.Thread(target=music)
+        music_thread.start()
+
+    def stop_music(self):
+        pygame.mixer.music.stop()
 

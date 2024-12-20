@@ -33,12 +33,11 @@ def is_valid_move(gsetup, selected_card, target_column_index):
         return selected_card.figure.lower().startswith("king")
 
     target_card = target_column[-1]
-    print(
-        f"DEBUG: Checking move: {selected_card.figure} ({selected_card.id}) to {target_card.figure} ({target_card.id})")
+    # print(
+    #     f"DEBUG: Checking move: {selected_card.figure} ({selected_card.id}) to {target_card.figure} ({target_card.id})")
     # Skip if target_card is the same as selected_card
     if selected_card == target_card:
         target_card = gsetup.bugfix_previous_card
-        print(f"TU BYL BUG JUZ NIE MA")
     else:
         gsetup.bugfix_previous_card = target_card
 

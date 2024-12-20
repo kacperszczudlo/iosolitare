@@ -49,8 +49,10 @@ def is_valid_move(gsetup, selected_card, target_column_index):
 def recycle_stock_waste(gsetup):
     # Przenoszenie kart z powrotem do stosu dobieralnego
     if gsetup.stock_waste:
+        print("TEST BUGA 2 ", gsetup.stock_waste)
         while gsetup.stock_waste:
             card = gsetup.stock_waste.pop()
+            print(f"card popped {card}")
             if any(card in area['stack'] for area in gsetup.upper_stack_areas):
                 continue
             card.hide()  # Zakrywanie kart
@@ -69,7 +71,7 @@ def recycle_stock_waste(gsetup):
             del gsetup.restore_button
 
         # Odświeżenie stosu kart
-        gsetup.game_ui.display_stock_pile()
+        gsetup.game_ui.display_stock_pile(gsetup.wyjebane)
         gsetup.game_ui.update_score(-50)
         print("Recycled stock waste back to stock pile.")
 
@@ -138,8 +140,8 @@ def is_game_won(gsetup):
 
 def is_game_won(gsetup):
     #IF DO TESTOW
-    # if gsetup.game_ui.score >= 20:
-    #     return True
+    if gsetup.game_ui.score >= 5:
+        return True
     print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))
     print("END GAME DEBUG Ilosc kart w stock_waste: ", len(gsetup.stock_waste))
     lista = []

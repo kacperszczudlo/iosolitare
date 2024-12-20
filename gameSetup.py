@@ -22,6 +22,7 @@ class GameSetup:
         self.move_counter = 0
         self.selected_card = None
         self.game_ui = GameUI(self)
+        self.wyjebane = []
         self.columns = [[] for _ in range(7)]
         script_dir = os.path.dirname(os.path.abspath(__file__))
         self.resources_dir = os.path.join(script_dir, 'resources')
@@ -189,7 +190,7 @@ class GameSetup:
                 card_label.bind("<ButtonPress-1>", partial(gameEvents.on_card_click, self))
                 card_label.bind("<B1-Motion>", partial(gameEvents.on_card_drag, self))
                 card_label.bind("<ButtonRelease-1>", partial(gameEvents.on_card_release, self))
-                card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self))
+                # card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self))
                 self.card_labels.append(card_label)
                 update_card_position(self, card, x_position, y_offset + row * y_spacing)
 
@@ -208,7 +209,7 @@ class GameSetup:
             card_label.bind("<ButtonPress-1>", partial(gameEvents.on_card_click, self))
             card_label.bind("<B1-Motion>", partial(gameEvents.on_card_drag, self))
             card_label.bind("<ButtonRelease-1>", partial(gameEvents.on_card_release, self))
-            card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self))
+            # card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self))
             self.card_labels.append(card_label)
             update_card_position(self, card, waste_x, waste_y)
 
@@ -220,7 +221,7 @@ class GameSetup:
                 card_label.bind("<ButtonPress-1>", partial(gameEvents.on_card_click, self))
                 card_label.bind("<B1-Motion>", partial(gameEvents.on_card_drag, self))
                 card_label.bind("<ButtonRelease-1>", partial(gameEvents.on_card_release, self))
-                card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self))
+                # card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self))
                 self.card_labels.append(card_label)
                 update_card_position(self, top_card, area['x'], area['y'])
 

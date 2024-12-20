@@ -46,7 +46,7 @@ class GameUI:
         card_label.bind("<ButtonPress-1>", partial(gameEvents.on_card_click, self.gameSetup))
         card_label.bind("<B1-Motion>", partial(gameEvents.on_card_drag, self.gameSetup))
         card_label.bind("<ButtonRelease-1>", partial(gameEvents.on_card_release, self.gameSetup))
-        card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self.gameSetup))
+        # card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self.gameSetup))
 
         return card_label
 
@@ -61,13 +61,15 @@ class GameUI:
                 self.gameSetup.card_labels.append(card_label)
                 update_card_position(self.gameSetup, card, x_position, y_position)
 
-    def display_stock_pile(self):
+    def display_stock_pile(self,wyjebane = []):
         stock_pile_x, stock_pile_y = 131, 153
         for i in range(len(self.gameSetup.first_deal.columns) * (len(self.gameSetup.first_deal.columns) + 1) // 2, len(self.gameSetup.deck.cards)):
-            self.gameSetup.deck.cards[i].hide()
-            card_label = self.create_card(stock_pile_x, stock_pile_y, self.gameSetup.deck.cards[i])
-            self.gameSetup.card_labels.append(card_label)
-            card_label.bind("<Button-1>", partial(gameEvents.on_stock_pile_click, self.gameSetup))
+            if self.gameSetup.deck.cards[i] not in wyjebane:
+                self.gameSetup.deck.cards[i].hide()
+                card_label = self.create_card(stock_pile_x, stock_pile_y, self.gameSetup.deck.cards[i])
+                self.gameSetup.card_labels.append(card_label)
+                card_label.bind("<Button-1>", partial(gameEvents.on_stock_pile_click, self.gameSetup))
+
 
     def highlight_card(self, card_label, color):
         card_label.config(bd=0, relief="solid", highlightbackground=color, highlightthickness=3)
@@ -110,22 +112,18 @@ class GameUI:
         self.score_label.config(text=f"Punkty: {self.score}")
 
     def show_centered_box(self):
-
         self.popup = tk.Toplevel(self.gameSetup.window)
         self.popup.title("Popup Window")
         self.popup.overrideredirect(True)
 
         initial_width = 10
         initial_height = 10
-        final_width = 400
-        final_height = 400
+        final_width = 730
+        final_height = 500
         self.popup.geometry(f"{initial_width}x{initial_height}")
 
         self.popup.grab_set()
-
-
         self.popup.resizable(False, False)
-
 
         self.gameSetup.window.update_idletasks()
         main_x = self.gameSetup.window.winfo_x()
@@ -133,67 +131,83 @@ class GameUI:
         main_width = self.gameSetup.window.winfo_width()
         main_height = self.gameSetup.window.winfo_height()
 
-
-
         x = main_x + (main_width // 2) - (final_width // 2)
         y = main_y + (main_height // 2) - (final_height // 2)
 
-
         self.popup.geometry(f"{final_width}x{final_height}+{x}+{y}")
 
-        #Wylacza klikanie rzeczy w tle
+        # Wyłącza klikanie rzeczy w tle
         self.gameSetup.window.attributes('-disabled', True)
 
-        border_frame = tk.Frame(self.popup, bd=5, relief=tk.SUNKEN, highlightbackground="black", highlightcolor="black", highlightthickness=5)
-        border_frame.pack(fill=tk.BOTH, expand=True)
+        # Ramka dla elementów
+        border_frame = tk.Frame(self.popup, bd=5, relief=tk.SUNKEN, highlightbackground="black", highlightcolor="black",
+                                highlightthickness=5)
+        border_frame.grid(row=0, column=0, sticky="nsew")  # Używamy grid() do rozmieszczenia border_frame
 
+        # Zawartość okienka
+        label_1 = Label(border_frame, text="Tu beda wyniki", font=("Arial", 12, "bold"), fg="white", bd=0,
+                        highlightthickness=0, bg="#5C4033")
+        label_1.grid(row=0, column=0, padx=0, pady=10)  # Pierwsza etykieta w siatce
 
-        bg_image = Image.open("resources/fireworks.jpg")
-        bg_image = bg_image.resize((final_width, final_height))
-        bg_photo = ImageTk.PhotoImage(bg_image)
+        label_2 = Label(border_frame, text=f"Czas: {self.elapsed_time} sekundy", font=("Arial", 12, "bold"), fg="white",
+                        bd=0, highlightthickness=0, bg="#5C4033")
+        label_2.grid(row=0, column=1, padx=10, pady=10)  # Druga etykieta obok pierwszej
 
-        bg_label = tk.Label(border_frame, image=bg_photo)
-        bg_label.image = bg_photo
-        bg_label.place(relwidth=1, relheight=1)
+        label_3 = Label(border_frame, text=f"Ruchy: {self.gameSetup.move_counter}", font=("Arial", 12, "bold"),
+                        fg="white", bd=0, highlightthickness=0, bg="#5C4033")
+        label_3.grid(row=0, column=2, padx=10, pady=10)  # Trzecia etykieta obok drugiej
 
-        # Zawartosc okienka
-        label = Label(border_frame, text="Tu beda wyniki", font=("Arial", 12, "bold"), fg="white", bd=0,
-                      highlightthickness=0,
-                      bg="#5C4033")
-        label.pack(pady=20)
+        label_4 = Label(border_frame, text=f"Punkty: {self.score} pkt", font=("Arial", 12, "bold"),
+                        fg="white", bd=0, highlightthickness=0, bg="#5C4033")
+        label_4.grid(row=0, column=3, padx=10, pady=10)  # Czwarta etykieta obok trzeciej
 
-        label = Label(border_frame, text=f"Czas: {self.elapsed_time} sekundy", font=("Arial", 12, "bold"), fg="white", bd=0,
-                      highlightthickness=0,
-                      bg="#5C4033")
-        label.pack(pady=20)
+        # Przycisk zamknięcia w prawym górnym rogu (tekst 'X')
+        close_button = tk.Button(border_frame, text="X", font=("Arial", 16, "bold"), fg="white", bd=0,
+                                 highlightthickness=0, bg="#FF5733", state="normal",
+                                 command=lambda: self.close_overlay())
+        close_button.grid(row=0, column=4, padx=10, pady=10, sticky="ne")  # Umieszczamy w prawym górnym rogu
 
-        label = Label(border_frame, text=f"Ruchy: {self.gameSetup.move_counter}", font=("Arial", 12, "bold"),
-                      fg="white", bd=0,
-                      highlightthickness=0,
-                      bg="#5C4033")
-        label.pack(pady=20)
-
-        label = Label(border_frame, text=f"Punkty: {self.score} pkt", font=("Arial", 12, "bold"),
-                      fg="white", bd=0,
-                      highlightthickness=0,
-                      bg="#5C4033")
-        label.pack(pady=20)
-
-        close_button = tk.Button(border_frame, text="Zamknij okno", font=("Arial", 12, "bold"), fg="white", bd=0,
-                        highlightthickness=0,
-                        bg="#5C4033", state="normal",command=lambda: self.close_overlay())
-        close_button.pack(pady=10)
-
+        # Przycisk restartu
         restart_button = tk.Button(border_frame, text="Nowa gra", font=("Arial", 12, "bold"), fg="white", bd=0,
-                                 highlightthickness=0,
-                                 bg="#5C4033", state="normal", command=lambda: self.restart())
+                                   highlightthickness=0, bg="#5C4033", state="normal", command=lambda: self.restart())
+        restart_button.grid(row=1, column=0, columnspan=4,
+                            pady=10)  # Przycisk w nowym wierszu, zajmujący cztery kolumny
 
-        restart_button.pack(pady=10)
+        # Animowany GIF (pod etykietami)
+        self.bg_image = ImageTk.PhotoImage(file="resources/skolim/palermo-ezgif.com-resize.gif", format="gif -index 0")
+        self.bg_label = tk.Label(border_frame, image=self.bg_image)
+        self.bg_label.image = self.bg_image
+        self.bg_label.grid(row=2, column=0, columnspan=4,
+                           sticky="nsew")  # GIF w nowym wierszu, zajmujący całą szerokość
 
-        # Wait until the popup is closed
-        self.popup.geometry(f"{final_width}x{final_height}+{x}+{y}")
-        self.animate_popup(initial_width, initial_height, final_width, final_height, x,y)
+        # Zmieniamy na grid dla pozostałych elementów
+        self.popup.grid_rowconfigure(0, weight=1)  # Pozwól na rozszerzanie pierwszego wiersza z etykietami
+        self.popup.grid_rowconfigure(1, weight=1)  # Pozwól na rozszerzanie drugiego wiersza z przyciskami
+        self.popup.grid_rowconfigure(2, weight=3)  # Pozwól na rozszerzanie trzeciego wiersza z GIF-em
+
+        # Animacja GIF-a
+        self.animate_gif("resources/skolim/palermo-ezgif.com-resize.gif")
+
         self.popup.wait_window()
+
+    def animate_gif(self, filepath):
+        self.frames = []
+        try:
+            img = Image.open(filepath)
+            while True:
+                self.frames.append(ImageTk.PhotoImage(img.copy()))
+                img.seek(len(self.frames))  # Przechodzi do kolejnej klatki
+        except EOFError:
+            pass
+
+        self.current_frame = 0
+
+        def update_frame():
+            self.bg_label.config(image=self.frames[self.current_frame])  # Ustawia obrazek na label
+            self.current_frame = (self.current_frame + 1) % len(self.frames)
+            self.bg_label.after(20, update_frame)  # Szybkość animacji (ms)
+
+        update_frame()
 
     def close_overlay(self):
         self.gameSetup.window.attributes('-disabled', False)

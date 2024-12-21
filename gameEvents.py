@@ -234,6 +234,7 @@ def on_card_release(gsetup, event):
 
                 if gsetup.selected_card in gsetup.stock_waste:
                     gsetup.stock_waste.remove(gsetup.selected_card)
+                    gsetup.wyjebane.append(gsetup.selected_card)
                 if gsetup.selected_card.foundation:
                     gsetup.game_ui.update_score(-15)
                 else:
@@ -313,85 +314,86 @@ def on_stock_pile_click(gsetup, event):
     elif gsetup.stock_waste:
         recycle_stock_waste(gsetup)
 
-#
-# def on_card_double_click(gsetup, event):
-#     card = event.widget.card_object
-#     if not card.revealed:
-#         return
-#
-#     card_suit = card.figure.split(' ')[-1]
-#
-#     for i, area in enumerate(gsetup.upper_stack_areas):
-#         if area['suit'] == card_suit:
-#             # As na pusty foundation
-#             if not area['stack'] and card.points == 1:
-#                 # Ruch poprawny
-#                 gsetup.save_game_state()
-#
-#                 gsetup.move_counter += 1
-#                 gsetup.game_ui.update_move_counter(gsetup.move_counter)
-#
-#                 area['stack'].append(card)
-#                 area['card'] = card
-#                 event.widget.place(x=area['x'], y=area['y'])
-#                 event.widget.lift()
-#
-#                 source_column = next((column for column in gsetup.columns if card in column), None)
-#                 if source_column:
-#                     source_column.remove(card)
-#                     if len(source_column) > 0:
-#                         gsetup.reveal_previous_card(source_column)
-#                         gsetup.game_ui.update_score(5)
-#                     else:
-#                         col_index = gsetup.columns.index(source_column)
-#                         print(f"Column {col_index + 1} is now empty.")
-#                 elif card in gsetup.stock_waste:
-#                     gsetup.stock_waste.remove(card)
-#                 gsetup.game_ui.update_score(10)
-#                 card.foundation = True
-#                 if is_game_won(gsetup):
-#                     gsetup.game_ui.show_centered_box()
-#                 print(f"Moved card {card.figure} to foundation stack ({area['suit']}).")
-#
-#                 print("Current state of all foundation stacks:")
-#                 for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
-#                     stack_cards = [c.figure for c in stack_area['stack']]
-#                     print(f"Foundation stack {idx} ({stack_area['suit']}): {stack_cards}")
-#                 return
-#
-#             # Kolejna karta na foundation
-#             elif area['stack'] and area['card'].points == card.points - 1:
-#                 gsetup.save_game_state()
-#
-#                 gsetup.move_counter += 1
-#                 gsetup.game_ui.update_move_counter(gsetup.move_counter)
-#
-#                 area['stack'].append(card)
-#                 area['card'] = card
-#                 event.widget.place(x=area['x'], y=area['y'])
-#                 event.widget.lift()
-#
-#                 source_column = next((column for column in gsetup.columns if card in column), None)
-#                 if source_column:
-#                     source_column.remove(card)
-#                     if len(source_column) > 0:
-#                         gsetup.reveal_previous_card(source_column)
-#                         gsetup.game_ui.update_score(5)
-#                     else:
-#                         col_index = gsetup.columns.index(source_column)
-#                         print(f"Column {col_index + 1} is now empty.")
-#                 elif card in gsetup.stock_waste:
-#                     gsetup.stock_waste.remove(card)
-#                 gsetup.game_ui.update_score(10)
-#                 if is_game_won(gsetup):
-#                     gsetup.game_ui.show_centered_box()
-#                 print(f"Moved card {card.figure} to foundation stack ({area['suit']}).")
-#
-#                 print("Current state of all foundation stacks:")
-#                 for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
-#                     stack_cards = [c.figure for c in stack_area['stack']]
-#                     print(f"Foundation stack {idx} ({stack_area['suit']}): {stack_cards}")
-#                 return
-#
-#     # Ruch niepoprawny - nie zapisujemy stanu
-#     print(f"Cannot move card {card.figure} to any foundation stack.")
+
+def on_card_double_click(gsetup, event):
+    card = event.widget.card_object
+    if not card.revealed:
+        return
+
+    card_suit = card.figure.split(' ')[-1]
+
+    for i, area in enumerate(gsetup.upper_stack_areas):
+        if area['suit'] == card_suit:
+            # As na pusty foundation
+            if not area['stack'] and card.points == 1:
+                # Ruch poprawny
+                gsetup.save_game_state()
+
+                gsetup.move_counter += 1
+                gsetup.game_ui.update_move_counter(gsetup.move_counter)
+
+                area['stack'].append(card)
+                area['card'] = card
+                event.widget.place(x=area['x'], y=area['y'])
+                event.widget.lift()
+
+                source_column = next((column for column in gsetup.columns if card in column), None)
+                if source_column:
+                    source_column.remove(card)
+                    if len(source_column) > 0:
+                        gsetup.reveal_previous_card(source_column)
+                        gsetup.game_ui.update_score(5)
+                    else:
+                        col_index = gsetup.columns.index(source_column)
+                        print(f"Column {col_index + 1} is now empty.")
+                elif card in gsetup.stock_waste:
+                    gsetup.stock_waste.remove(card)
+
+                gsetup.game_ui.update_score(10)
+                card.foundation = True
+                if is_game_won(gsetup):
+                    gsetup.game_ui.show_centered_box()
+                print(f"Moved card {card.figure} to foundation stack ({area['suit']}).")
+
+                print("Current state of all foundation stacks:")
+                for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
+                    stack_cards = [c.figure for c in stack_area['stack']]
+                    print(f"Foundation stack {idx} ({stack_area['suit']}): {stack_cards}")
+                return
+
+            # Kolejna karta na foundation
+            elif area['stack'] and area['card'].points == card.points - 1:
+                gsetup.save_game_state()
+
+                gsetup.move_counter += 1
+                gsetup.game_ui.update_move_counter(gsetup.move_counter)
+
+                area['stack'].append(card)
+                area['card'] = card
+                event.widget.place(x=area['x'], y=area['y'])
+                event.widget.lift()
+
+                source_column = next((column for column in gsetup.columns if card in column), None)
+                if source_column:
+                    source_column.remove(card)
+                    if len(source_column) > 0:
+                        gsetup.reveal_previous_card(source_column)
+                        gsetup.game_ui.update_score(5)
+                    else:
+                        col_index = gsetup.columns.index(source_column)
+                        print(f"Column {col_index + 1} is now empty.")
+                elif card in gsetup.stock_waste:
+                    gsetup.stock_waste.remove(card)
+                gsetup.game_ui.update_score(10)
+                if is_game_won(gsetup):
+                    gsetup.game_ui.show_centered_box()
+                print(f"Moved card {card.figure} to foundation stack ({area['suit']}).")
+
+                print("Current state of all foundation stacks:")
+                for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
+                    stack_cards = [c.figure for c in stack_area['stack']]
+                    print(f"Foundation stack {idx} ({stack_area['suit']}): {stack_cards}")
+                return
+
+    # Ruch niepoprawny - nie zapisujemy stanu
+    print(f"Cannot move card {card.figure} to any foundation stack.")

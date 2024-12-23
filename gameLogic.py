@@ -139,8 +139,8 @@ def is_game_won(gsetup):
 
 def is_game_won(gsetup):
     #IF DO TESTOW
-    if gsetup.game_ui.score >= 5:
-        return True
+    # if gsetup.game_ui.score >= 5:
+    #     return True
     print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))
     print("END GAME DEBUG Ilosc kart w stock_waste: ", len(gsetup.stock_waste))
     lista = []

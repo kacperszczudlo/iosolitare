@@ -110,63 +110,50 @@ class GameUI:
         self.pause = False
         self.score_label.config(text=f"Punkty: {self.score}")
 
-    
     def show_centered_box(self):
         self.popup = tk.Toplevel(self.gameSetup.window)
-        self.popup.title("Popup Window")
-        self.popup.overrideredirect(True)
-
+        self.popup.title("Gratulacje wygrałeś!!!")
         final_width = 730
-        final_height = 500
+        final_height = 430
         self.popup.geometry(f"{final_width}x{final_height}")
-
-        self.popup.grab_set()
         self.popup.resizable(False, False)
 
-        self.gameSetup.window.update_idletasks()
-        main_x = self.gameSetup.window.winfo_x()
-        main_y = self.gameSetup.window.winfo_y()
-        main_width = self.gameSetup.window.winfo_width()
-        main_height = self.gameSetup.window.winfo_height()
-
-        x = main_x + (main_width // 2) - (final_width // 2)
-        y = main_y + (main_height // 2) - (final_height // 2)
-
-        self.popup.geometry(f"{final_width}x{final_height}+{x}+{y}")
-
-        self.gameSetup.window.attributes('-disabled', True)
+        self.popup.grab_set()
 
         button_frame = tk.Frame(self.popup, bg="#5C4033")
-        button_frame.place(x=0, y=0, relwidth=1, height=80)  # Adjust height to fit frame
+        button_frame.place(x=0, y=0, relwidth=1, height=45)
 
+        best_scores_button = tk.Button(button_frame, text="Najlepsze wyniki", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")
+        best_scores_button.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
 
-        label_1 = tk.Label(button_frame, text="Tu beda wyniki", font=("Arial", 12, "bold"), fg="white", bg="#5C4033", bd=2, relief="groove")
-        label_1.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
-
-        label_2 = tk.Label(button_frame, text=f"Czas: {self.elapsed_time} sekundy", font=("Arial", 12, "bold"), fg="white", bg="#5C4033", bd=2, relief="groove")
+        label_2 = tk.Label(button_frame, text=f"Czas: {self.elapsed_time} sekundy", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")
         label_2.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
 
-        label_3 = tk.Label(button_frame, text=f"Ruchy: {self.gameSetup.move_counter}", font=("Arial", 12, "bold"), fg="white", bg="#5C4033", bd=2, relief="groove")
+        label_3 = tk.Label(button_frame, text=f"Ruchy: {self.gameSetup.move_counter}", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")
         label_3.grid(row=0, column=2, padx=5, pady=5, sticky="ew")
 
-        label_4 = tk.Label(button_frame, text=f"Punkty: {self.score} pkt", font=("Arial", 12, "bold"), fg="white", bg="#5C4033", bd=2, relief="groove")
+        label_4 = tk.Label(button_frame, text=f"Punkty: {self.score} pkt", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")
         label_4.grid(row=0, column=3, padx=5, pady=5, sticky="ew")
 
-        restart_button = tk.Button(button_frame, text="Nowa gra", font=("Arial", 12, "bold"), fg="white", bg="#5C4033", bd=2, relief="groove", command=lambda: self.restart())
+        restart_button = tk.Button(button_frame, text="Nowa gra", font=("Arial", 12, "bold"), fg="white", bg="#5C4033", command=lambda: self.restart())
         restart_button.grid(row=0, column=4, padx=5, pady=5, sticky="ew")
 
         for i in range(5):
-            button_frame.grid_columnconfigure(i, weight=1)  # Distribute columns evenly
+            button_frame.grid_columnconfigure(i, weight=1)
 
-
-        self.bg_image = ImageTk.PhotoImage(file="resources/skolim/palermo-ezgif.com-resize.gif", format="gif -index 0")
+        self.bg_image = ImageTk.PhotoImage(file="resources/win/palermo.gif", format="gif -index 0")
         self.bg_label = tk.Label(self.popup, image=self.bg_image)
         self.bg_label.image = self.bg_image
-        self.bg_label.place(x=0, y=80, relwidth=1, relheight=0.84)  # Adjust y and relheight to fit the frame
-        self.play_music("resources/skolim/PALERMO.mp3")
-        self.animate_gif("resources/skolim/palermo-ezgif.com-resize.gif")
+        self.bg_label.place(x=0, y=45, relwidth=1, relheight=0.95)
+        self.play_music("resources/win/palermo.mp3")
+        self.animate_gif("resources/win/palermo.gif")
 
-        self.popup.wait_window()
+        self.popup.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    def on_close(self):
+        self.stop_music()
+        self.popup.destroy()
+        self.gameSetup.window.attributes('-disabled', False)
 
     def animate_gif(self, filepath):
         self.frames = []
@@ -220,7 +207,7 @@ class GameUI:
         def music():
             pygame.mixer.init()
             pygame.mixer.music.load(file_path)
-            pygame.mixer.music.set_volume(0.2)
+            pygame.mixer.music.set_volume(0.05)
             pygame.mixer.music.play(-1)
             while pygame.mixer.music.get_busy():
                 pygame.time.Clock().tick(10)

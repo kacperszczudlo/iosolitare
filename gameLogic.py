@@ -158,12 +158,71 @@ def is_game_won(gsetup):
                     smalllist.append(False)
         lista.append(smalllist)
 
-    print("END GAME DEBUG lista", lista)
-    print("END GAME DEBUG ALL", all(map(lambda x: all(x), lista)))
-    print("END GAME DEBUG ANY", any(map(lambda x: any(x), lista)))
-    print("END GAME DEBUG Check", list(map(lambda x: isinstance(x, type(None)) or all(x), lista)))
     if len(gsetup.stock_pile) == 0 and len(gsetup.stock_waste) == 0 and all(
             map(lambda x: isinstance(x, type(None)) or all(x), lista)):
         return True
     else:
         return False
+
+
+
+
+
+def get_highscore():
+    import psycopg2
+    try:
+        print("Start connecting...")
+        connection = psycopg2.connect(
+            host="195.150.230.208",
+            port="5432",
+            user="2024_jop_kamil",
+            password="pedofil",
+            database="2024_jop_kamil"
+        )
+        print("Connected successfully!")
+
+        cursor = connection.cursor()
+        cursor.execute('''
+                        SELECT nickname,score 
+                        FROM player
+                        ORDER BY score DESC''')
+        results = cursor.fetchall()
+
+        connection.close()
+        print("Connection closed.")
+        print(results)
+        return results
+
+    except psycopg2.Error as e:
+        print("Database error:", e)
+
+
+def add_highscore(nick, points):
+    import psycopg2
+    try:
+        print("Connecting to the database...")
+        connection = psycopg2.connect(
+            host="195.150.230.208",
+            port="5432",
+            user="2024_jop_kamil",
+            password="pedofil",
+            database="2024_jop_kamil"
+        )
+        print("Connected successfully!")
+
+        cursor = connection.cursor()
+        # Use parameterized query to prevent SQL injection
+        query = "INSERT INTO player (nickname, score) VALUES (%s, %s);"
+        cursor.execute(query, (nick, points))
+
+        # Commit the transaction
+        connection.commit()
+        print("Highscore added successfully!")
+
+    except psycopg2.Error as e:
+        print("Database error:", e)
+    finally:
+        if connection:
+            cursor.close()
+            connection.close()
+            print("Connection closed.")

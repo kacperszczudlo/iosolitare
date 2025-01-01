@@ -1,6 +1,8 @@
 import os
 from tkinter import *
 from PIL import Image, ImageTk
+
+from gameLogic import get_highscore
 from gameSetup import GameSetup
 from gameUI import GameUI
 
@@ -83,7 +85,7 @@ class PasjansApp:
         menu_button_y = 400
         button_font = ("Arial", 12, "bold")
         self.create_button(temp_game_ui, "Nowa gra", 130, menu_button_y - 100, button_width, self.start_game, button_font)
-        self.create_button(temp_game_ui, "Najlepsze wyniki", 130, menu_button_y - 50, button_width, None, button_font)
+        self.create_button(temp_game_ui, "Najlepsze wyniki", 130, menu_button_y - 50, button_width, self.show_highscore, button_font)
         self.create_button(temp_game_ui, "Zasady Gry", 130, menu_button_y, button_width, self.show_game_rules, button_font)
         self.create_button(temp_game_ui, "Samouczek", 130, menu_button_y + 50, button_width, None, button_font)
         self.create_button(temp_game_ui, "Zmiana Motywu", 130, menu_button_y + 100, button_width, None, button_font)
@@ -142,6 +144,35 @@ class PasjansApp:
             user_interface.create_placeholder(x, y)
 
         game_setup.reset_game()
+
+    def show_highscore(self):
+        # Create a new Toplevel window for the highscore
+        wyniki = get_highscore()
+        highscore_window = Toplevel(self.root)
+        highscore_window.title("Najlepsze wyniki")
+        highscore_window.geometry("600x330")
+        highscore_window.resizable(False, False)
+
+        # Add a frame for the high scores
+        highscore_frame = Frame(highscore_window, bg="#5C4033")
+        highscore_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Add a title label
+        title_label = Label(highscore_frame, text="Najlepsze wyniki", font=("Arial", 16, "bold"), fg="white",
+                               bg="#5C4033")
+        title_label.pack(pady=(0, 10))
+
+        # Display the high scores
+        for index, (nickname, score) in enumerate(wyniki[:10]):
+            label_text = f"{index + 1}. {nickname}: {score} points"
+            label = Label(highscore_frame, text=label_text, font=("Arial", 12), fg="white", bg="#5C4033")
+            label.pack(anchor="w")
+
+        # If there are fewer than 10 results, add empty labels for the remaining spots
+        for i in range(10 - len(wyniki)):
+            label = Label(highscore_frame, text=f"{len(wyniki) + i + 1}. -", font=("Arial", 12), fg="white",
+                             bg="#5C4033")
+            label.pack(anchor="w")
 
 
 if __name__ == "__main__":

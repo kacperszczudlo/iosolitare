@@ -18,6 +18,7 @@ class GameUI:
         self.score = 0
         self.pause = False
         self.root = root
+        self.added = False
 
     def create_button(self, text, x, y, width, command=None):
         button = Button(self.gameSetup.window, text=text, font=("Arial", 12, "bold"), fg="white", bd=0, highlightthickness=0,
@@ -123,19 +124,24 @@ class GameUI:
         button_frame = tk.Frame(self.popup, bg="#5C4033")
         button_frame.place(x=0, y=0, relwidth=1, height=45)
 
-        best_scores_button = tk.Button(button_frame, text="Najlepsze wyniki", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")
+        best_scores_button = tk.Button(button_frame, text="Najlepsze wyniki", font=("Arial", 12, "bold"), fg="white",
+                                       bg="#5C4033", command=self.show_highscore)
         best_scores_button.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
 
-        label_2 = tk.Label(button_frame, text=f"Czas: {self.elapsed_time} sekundy", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")
+        label_2 = tk.Label(button_frame, text=f"Czas: {self.elapsed_time} sekundy", font=("Arial", 12, "bold"),
+                           fg="white", bg="#5C4033")
         label_2.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
 
-        label_3 = tk.Label(button_frame, text=f"Ruchy: {self.gameSetup.move_counter}", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")
+        label_3 = tk.Label(button_frame, text=f"Ruchy: {self.gameSetup.move_counter}", font=("Arial", 12, "bold"),
+                           fg="white", bg="#5C4033")
         label_3.grid(row=0, column=2, padx=5, pady=5, sticky="ew")
 
-        label_4 = tk.Label(button_frame, text=f"Punkty: {self.score} pkt", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")
+        label_4 = tk.Label(button_frame, text=f"Punkty: {self.score} pkt", font=("Arial", 12, "bold"), fg="white",
+                           bg="#5C4033")
         label_4.grid(row=0, column=3, padx=5, pady=5, sticky="ew")
 
-        restart_button = tk.Button(button_frame, text="Nowa gra", font=("Arial", 12, "bold"), fg="white", bg="#5C4033", command=lambda: self.restart())
+        restart_button = tk.Button(button_frame, text="Nowa gra", font=("Arial", 12, "bold"), fg="white", bg="#5C4033",
+                                   command=lambda: self.restart())
         restart_button.grid(row=0, column=4, padx=5, pady=5, sticky="ew")
 
         for i in range(5):
@@ -145,8 +151,23 @@ class GameUI:
         self.bg_label = tk.Label(self.popup, image=self.bg_image)
         self.bg_label.image = self.bg_image
         self.bg_label.place(x=0, y=45, relwidth=1, relheight=0.95)
+
         self.play_music("resources/win/palermo.mp3")
         self.animate_gif("resources/win/palermo.gif")
+
+        # Frame for high score input
+        input_frame = tk.Frame(self.popup, bg="#5C4033")
+        input_frame.place(relx=0.5, rely=0.85, anchor="center")
+
+        name_label = tk.Label(input_frame, text="Twoje imię:", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")
+        name_label.grid(row=0, column=0, padx=5, pady=5)
+
+        self.name_entry = tk.Entry(input_frame, font=("Arial", 12))
+        self.name_entry.grid(row=0, column=1, padx=5, pady=5)
+
+        submit_button = tk.Button(input_frame, text="Dodaj wynik", font=("Arial", 12, "bold"), fg="white", bg="#5C4033",
+                                  command=self.submit_highscore)
+        submit_button.grid(row=0, column=2, padx=5, pady=5)
 
         self.popup.protocol("WM_DELETE_WINDOW", self.on_close)
 
@@ -218,3 +239,42 @@ class GameUI:
     def stop_music(self):
         pygame.mixer.music.stop()
 
+    def show_highscore(self):
+        # Temporarily release grab
+        self.popup.grab_release()
+
+        # Create a new Toplevel window for the highscore
+        wyniki = get_highscore()
+        highscore_window = tk.Toplevel(self.gameSetup.window)
+        highscore_window.title("Najlepsze wyniki")
+        highscore_window.geometry("600x330")
+        highscore_window.resizable(False, False)
+
+        # Add a frame for the high scores
+        highscore_frame = tk.Frame(highscore_window, bg="#5C4033")
+        highscore_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Add a title label
+        title_label = tk.Label(highscore_frame, text="Najlepsze wyniki", font=("Arial", 16, "bold"), fg="white",
+                               bg="#5C4033")
+        title_label.pack(pady=(0, 10))
+
+        # Display the high scores
+        for index, (nickname, score) in enumerate(wyniki[:10]):
+            label_text = f"{index + 1}. {nickname}: {score} points"
+            label = tk.Label(highscore_frame, text=label_text, font=("Arial", 12), fg="white", bg="#5C4033")
+            label.pack(anchor="w")
+
+        # If there are fewer than 10 results, add empty labels for the remaining spots
+        for i in range(10 - len(wyniki)):
+            label = tk.Label(highscore_frame, text=f"{len(wyniki) + i + 1}. -", font=("Arial", 12), fg="white",
+                             bg="#5C4033")
+            label.pack(anchor="w")
+
+
+
+    def submit_highscore(self):
+        player_name = self.name_entry.get().strip()
+        if not self.added and player_name:
+            self.added = True
+            add_highscore(player_name,self.score)

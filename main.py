@@ -16,8 +16,9 @@ class PasjansApp:
         self.resources_dir = os.path.join(self.script_dir, 'resources')
         self.cards_dir = os.path.join(self.resources_dir, 'cards', 'default')
 
-        self.current_theme = "default"
-        self.current_soundtrack = "default.mp3"
+        self.current_theme = "default"  # Zmieniony na default
+        self.current_gif = 'resources/win/default/fireworks.jpg'  # Dodany domyślny GIF
+        self.current_soundtrack = 'resources/soundtracks/default/default.mp3'  # Dodany domyślny dźwięk
         self.game_background_path = os.path.join(self.resources_dir, 'background', 'default_background.jpg')
 
         self.menu_background_path = os.path.join(self.script_dir, 'resources', 'menu', 'menu.jpg')
@@ -95,6 +96,7 @@ class PasjansApp:
             label.place(x=x, y=y)
 
         game_setup = GameSetup(self.root, self.resources_dir, self.cards_dir)
+        game_setup.app = self  # Dodaj ten wiersz, aby gameSetup miało odniesienie do app
         user_interface = GameUI(game_setup, self.root)
 
         user_interface.create_button("Nowa gra", 130, 16, 119, game_setup.reset_game)
@@ -108,6 +110,7 @@ class PasjansApp:
             user_interface.create_placeholder(x, y)
 
         game_setup.reset_game()
+
 
     def show_highscore(self):
         wyniki = get_highscore()

@@ -125,35 +125,35 @@ class GameUI:
         button_frame.place(x=0, y=0, relwidth=1, height=45)
 
         best_scores_button = tk.Button(button_frame, text="Najlepsze wyniki", font=("Arial", 12, "bold"), fg="white",
-                                       bg="#5C4033", command=self.show_highscore)
+                                    bg="#5C4033", command=self.show_highscore)
         best_scores_button.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
 
         label_2 = tk.Label(button_frame, text=f"Czas: {self.elapsed_time} sekundy", font=("Arial", 12, "bold"),
-                           fg="white", bg="#5C4033")
+                        fg="white", bg="#5C4033")
         label_2.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
 
         label_3 = tk.Label(button_frame, text=f"Ruchy: {self.gameSetup.move_counter}", font=("Arial", 12, "bold"),
-                           fg="white", bg="#5C4033")
+                        fg="white", bg="#5C4033")
         label_3.grid(row=0, column=2, padx=5, pady=5, sticky="ew")
 
         label_4 = tk.Label(button_frame, text=f"Punkty: {self.score} pkt", font=("Arial", 12, "bold"), fg="white",
-                           bg="#5C4033")
+                        bg="#5C4033")
         label_4.grid(row=0, column=3, padx=5, pady=5, sticky="ew")
 
         restart_button = tk.Button(button_frame, text="Nowa gra", font=("Arial", 12, "bold"), fg="white", bg="#5C4033",
-                                   command=lambda: self.restart())
+                                command=lambda: self.restart())
         restart_button.grid(row=0, column=4, padx=5, pady=5, sticky="ew")
 
         for i in range(5):
             button_frame.grid_columnconfigure(i, weight=1)
 
-        self.bg_image = ImageTk.PhotoImage(file="resources/win/alternative/palermo.gif", format="gif -index 0")
+        self.bg_image = ImageTk.PhotoImage(file=self.gameSetup.app.current_gif, format="gif -index 0")
         self.bg_label = tk.Label(self.popup, image=self.bg_image)
         self.bg_label.image = self.bg_image
         self.bg_label.place(x=0, y=45, relwidth=1, relheight=0.95)
 
-        self.play_music("resources/soundtracks/alternative/palermo.mp3")
-        self.animate_gif("resources/win/alternative/palermo.gif")
+        self.play_music(self.gameSetup.app.current_soundtrack)
+        self.animate_gif(self.gameSetup.app.current_gif)
 
         # Frame for high score input
         input_frame = tk.Frame(self.popup, bg="#5C4033")
@@ -166,10 +166,11 @@ class GameUI:
         self.name_entry.grid(row=0, column=1, padx=5, pady=5)
 
         submit_button = tk.Button(input_frame, text="Dodaj wynik", font=("Arial", 12, "bold"), fg="white", bg="#5C4033",
-                                  command=self.submit_highscore)
+                                command=self.submit_highscore)
         submit_button.grid(row=0, column=2, padx=5, pady=5)
 
         self.popup.protocol("WM_DELETE_WINDOW", self.on_close)
+
 
     def on_close(self):
         self.stop_music()

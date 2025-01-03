@@ -9,8 +9,12 @@ class Settings(tk.Toplevel):
         if not show:
             self.withdraw()  # Ukryj okno jeśli `show` jest ustawione na False
         self.title("Settings")
-        self.geometry("400x250")
+        self.geometry("375x250")
         self.resizable(False, False)
+
+        self.soundtrack_index = 0
+        self.soundtracks = [ ('default', 'resources/soundtracks/default/default.mp3', 'resources/win/default/fireworks.jpg'), 
+                            ('alternative', 'resources/soundtracks/alternative/palermo.mp3', 'resources/win/alternative/palermo.gif') ]
 
         self.hearts_image_path = os.path.join(self.app.script_dir, 'resources', 'placeholders', 'hearts_placeholder.png')
         self.diamonds_image_path = os.path.join(self.app.script_dir, 'resources', 'placeholders', 'diamonds_placeholder.png')
@@ -29,9 +33,9 @@ class Settings(tk.Toplevel):
 
     def populate_settings_frame(self):
         button_font = ("Arial", 12, "bold")
-        button_width = 20
+        button_width = 15
 
-        self.create_button("Zmień motyw kart", 0, button_width, self.change_theme, button_font)
+        self.create_button("Zmień motyw", 0, button_width, self.change_theme, button_font)
 
         self.theme_preview_frame = tk.Frame(self.settings_frame)
         self.theme_preview_frame.grid(row=0, column=1, padx=10, pady=10, sticky="e")
@@ -47,15 +51,25 @@ class Settings(tk.Toplevel):
         self.background_preview = tk.Label(self.settings_frame)
         self.background_preview.grid(row=1, column=1, padx=10, pady=10, sticky="e")
 
-        self.create_button("Zmień ścieżkę dźwiękową", 2, button_width, self.change_soundtrack, button_font)  # dummy_command zamiast change_soundtrack
+        self.create_button("Zmień dźwięk", 2, button_width, self.change_soundtrack, button_font)
 
-        self.soundtrack_preview = tk.Label(self.settings_frame, text=self.app.current_soundtrack)
+        self.soundtrack_preview = tk.Label(self.settings_frame, text=self.soundtracks[self.soundtrack_index][0])
         self.soundtrack_preview.grid(row=2, column=1, padx=10, pady=10, sticky="e")
 
         self.update_previews()
 
     def change_soundtrack(self):
-        pass
+        self.soundtrack_index = (self.soundtrack_index + 1) % len(self.soundtracks)
+        soundtrack_name, soundtrack, gif = self.soundtracks[self.soundtrack_index]
+
+        self.app.current_soundtrack = soundtrack
+        self.app.current_gif = gif
+
+        print(f"Ścieżka dźwiękowa zmieniona na: {self.app.current_soundtrack}")
+        print(f"GIF zmieniony na: {self.app.current_gif}")
+
+        self.soundtrack_preview.config(text=soundtrack_name)
+        self.update_previews()
 
     def update_previews(self):
         # Aktualizuj podgląd dla motywu kart
@@ -72,9 +86,6 @@ class Settings(tk.Toplevel):
         background_image = self.load_image(self.app.game_background_path, (100, 50))
         self.background_preview.config(image=background_image)
         self.background_preview.image = background_image  # Zachowaj referencję, aby zapobiec odświeżaniu obrazu
-
-        # Aktualizuj podgląd dla ścieżki dźwiękowej
-        self.soundtrack_preview.config(text=self.app.current_soundtrack)
 
     def change_theme(self):
         if self.app.current_theme == "alternative":

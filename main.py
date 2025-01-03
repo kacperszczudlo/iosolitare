@@ -16,6 +16,11 @@ class PasjansApp:
         self.root.geometry("1200x800")
         self.root.resizable(False, False)
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.resources_dir = os.path.join(self.script_dir, 'resources')
+        self.cards_dir = os.path.join(self.resources_dir, 'cards', 'default')
+
+        # Flaga do zmiany motywu
+        self.current_theme = "default"
 
         # Ścieżki do obrazów
         self.menu_background_path = os.path.join(self.script_dir, 'resources','menu', 'menu.jpg')
@@ -37,6 +42,22 @@ class PasjansApp:
         self.prepared_foundation_images = self.prepare_foundation_images()
 
         self.current_frame = None
+        self.show_menu()
+
+    def change_theme(self):
+        """
+        Zmienia motyw kart pomiędzy 'alternative' i 'default'.
+        """
+        if self.current_theme == "alternative":
+            self.cards_dir = os.path.join(self.resources_dir, 'cards', 'default')
+            self.current_theme = "default"
+        else:
+            self.cards_dir = os.path.join(self.resources_dir, 'cards', 'alternative')
+            self.current_theme = "alternative"
+
+        print(f"Motyw zmieniony na: {self.current_theme}")
+
+        # Odśwież menu, aby zmiana motywu była widoczna
         self.show_menu()
 
     def prepare_foundation_images(self):
@@ -80,7 +101,7 @@ class PasjansApp:
         corona_label = Label(self.current_frame, image=self.corona_image)
         corona_label.place(x=500, y=300)
 
-        temp_game_ui = GameUI(GameSetup(self.root))
+        temp_game_ui = GameUI(GameSetup(self.root,self.resources_dir, self.cards_dir))
         button_width = 200
         menu_button_y = 400
         button_font = ("Arial", 12, "bold")
@@ -88,7 +109,7 @@ class PasjansApp:
         self.create_button(temp_game_ui, "Najlepsze wyniki", 130, menu_button_y - 50, button_width, self.show_highscore, button_font)
         self.create_button(temp_game_ui, "Zasady Gry", 130, menu_button_y, button_width, self.show_game_rules, button_font)
         self.create_button(temp_game_ui, "Samouczek", 130, menu_button_y + 50, button_width, None, button_font)
-        self.create_button(temp_game_ui, "Zmiana Motywu", 130, menu_button_y + 100, button_width, None, button_font)
+        self.create_button(temp_game_ui, "Zmiana Motywu", 130, menu_button_y + 100, button_width, self.change_theme, button_font)
 
     def create_button(self, game_ui, text, x, y, width, command, font):
         button = Button(self.current_frame, text=text, font=font, fg="white", bd=0, highlightthickness=0,
@@ -113,6 +134,8 @@ class PasjansApp:
         self.current_frame = Frame(self.root)
         self.current_frame.pack(fill="both", expand=True)
 
+
+
         background_label = Label(self.current_frame, image=self.game_background_image)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
@@ -129,7 +152,7 @@ class PasjansApp:
             label.image = tk_image  # Zachowaj referencję do obrazu
             label.place(x=x, y=y)
 
-        game_setup = GameSetup(self.root)
+        game_setup = GameSetup(self.root,self.resources_dir, self.cards_dir)
         user_interface = GameUI(game_setup,self.root)
 
         user_interface.create_button("Nowa gra", 130, 16, 119, game_setup.reset_game)

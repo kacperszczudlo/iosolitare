@@ -6,14 +6,14 @@ Gra oferuje możliwość przeciągania i upuszczania kart, sprawdzania poprawno�
 ---
 
 ## Spis treści
-1. [Opis projektu](#opis-projektu)
-2. [Funkcjonalności](#funkcjonalności)
-3. [Struktura plików](#struktura-plików)
-4. [Wymagania](#wymagania)
-5. [Instrukcja instalacji](#instrukcja-instalacji)
-6. [Uruchomienie projektu](#uruchomienie-projektu)
-7. [Jak grać](#jak-grać)
-8. [Dodatkowe informacje](#dodatkowe-informacje)
+1. [Opis projektu](#opis-projektu)  
+2. [Funkcjonalności](#funkcjonalności)  
+3. [Struktura plików](#struktura-plików)  
+4. [Wymagania](#wymagania)  
+5. [Instrukcja instalacji](#instrukcja-instalacji)  
+6. [Uruchomienie projektu](#uruchomienie-projektu)  
+7. [Jak grać](#jak-grać)  
+8. [Dodatkowe informacje](#dodatkowe-informacje)  
 9. [Kontakt](#kontakt)
 
 ---
@@ -21,10 +21,11 @@ Gra oferuje możliwość przeciągania i upuszczania kart, sprawdzania poprawno�
 ## Opis projektu
 
 Gra Pasjans (Klondike) jest jedną z najpopularniejszych odmian pasjansa. W tym projekcie zaimplementowano następujące elementy:
-- Logikę rozkładania kart (pierwsze rozdanie) zgodnie z klasycznymi zasadami.
-- Obsługę ruchów (przeciąganie i upuszczanie kart do kolumn, na stos typu foundation, a także na stos dobierania i stos odrzuconych).
-- Interfejs graficzny utworzony w oparciu o **Tkinter** – karty są prezentowane w formie etykiet (`Label`), które można przeciągać myszą.
-- Częściową integrację z bazą danych PostgreSQL w celu zapisywania i odczytywania najlepszych wyników (high score).
+
+- **Logika rozkładania kart** (pierwsze rozdanie) zgodnie z klasycznymi zasadami.
+- **Obsługa ruchów** (przeciąganie i upuszczanie kart do kolumn, na stos typu foundation, a także na stos dobierania i stos odrzuconych).
+- **Interfejs graficzny** utworzony w oparciu o Tkinter – karty są prezentowane w formie etykiet (`Label`), które można przeciągać myszą.
+- **Integracja z bazą danych** PostgreSQL w celu zapisywania i odczytywania najlepszych wyników (high score).
 
 ---
 
@@ -60,7 +61,7 @@ Gra Pasjans (Klondike) jest jedną z najpopularniejszych odmian pasjansa. W tym 
 
 8. **Efekty wizualno-muzyczne**  
    - Prosta animacja GIF po wygranej.  
-   - Odtwarzanie dźwięku w tle (wykorzystanie biblioteki **pygame**).
+   - Odtwarzanie dźwięku w tle (biblioteka `pygame`).
 
 ---
 
@@ -174,16 +175,15 @@ Gra Pasjans (Klondike) jest jedną z najpopularniejszych odmian pasjansa. W tym 
 - **Timer i punkty**: W prawym górnym rogu widać zegar odmierzający czas gry, licznik ruchów oraz aktualną liczbę punktów.  
 - **Animacja i muzyka**: Po wygranej wyświetla się animacja GIF i odtwarza się muzyka z katalogu `resources/win/` (wymaga biblioteki **pygame**).  
 - **Zapis wyników**: Jeśli wprowadzisz swój nick i klikniesz **Dodaj wynik** po wygranej, wynik zapisze się w bazie.  
-- **Najlepsze wyniki**: Możesz podejrzeć listę rankingową z bazy danych w menu głównym.  
+- **Najlepsze wyniki**: Możesz podejrzeć listę rankingową z bazy danych w menu głównym.
 
 ---
 
 ## Kontakt
 
 W razie pytań lub problemów prosimy o kontakt:
-- **Email**: [kacper.szczudlo@gmail.com](mailto:kacper.szczudlo@gmail.com)
+- **Email**: [kacper.szczudlo@gmail.com ](mailto:kacper.szczudlo@gmail.com )
 - **GitHub**: [kacperszczudlo](https://github.com/kacperszczudlo)
 
 Zapraszamy do testowania, zgłaszania uwag i propozycji rozwoju!
-
 

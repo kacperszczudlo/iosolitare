@@ -181,8 +181,8 @@ Gra Pasjans (Klondike) jest jedną z najpopularniejszych odmian pasjansa. W tym 
 ## Kontakt
 
 W razie pytań lub problemów prosimy o kontakt:
-- **Email**: [twoj_email@example.com](mailto:kacper.szczudlo@gmail.com)
-- **GitHub**: [TwójNickGitHub](https://github.com/kacperszczudlo)
+- **Email**: [kacper.szczudlo@gmail.com](mailto:kacper.szczudlo@gmail.com)
+- **GitHub**: [kacperszczudlo](https://github.com/kacperszczudlo)
 
 Zapraszamy do testowania, zgłaszania uwag i propozycji rozwoju!
 

@@ -46,23 +46,30 @@ class PasjansApp:
 
     def change_theme(self):
         """
-        Zmienia motyw kart pomiędzy 'alternative' i 'default'.
+        Zmienia motyw kart i tła gry pomiędzy 'alternative' i 'default'.
         """
         if self.current_theme == "alternative":
             self.cards_dir = os.path.join(self.resources_dir, 'cards', 'default')
+            self.game_background_path = os.path.join(self.resources_dir, 'background', 'background.jpg')
             self.current_theme = "default"
         else:
             self.cards_dir = os.path.join(self.resources_dir, 'cards', 'alternative')
+            self.game_background_path = os.path.join(self.resources_dir, 'background', 'alternative_background3.jpg')
             self.current_theme = "alternative"
+
+        # Załaduj nowe tło
+        self.prepared_foundation_images = self.prepare_foundation_images()
+
+        self.game_background_image = ImageTk.PhotoImage(Image.open(self.game_background_path).resize((1200, 800)))
 
         print(f"Motyw zmieniony na: {self.current_theme}")
 
-        # Odśwież menu, aby zmiana motywu była widoczna
+
         self.show_menu()
 
     def prepare_foundation_images(self):
         """
-        Przygotowuje obrazy dla stosów końcowych (łączy tło z placeholderami).
+        Przygotowuje obrazy dla stosów końcowych (łączy tło z placeholderami) w oparciu o aktualny motyw.
         """
         foundation_positions = [
             (550, 153, self.hearts_image_path),
@@ -73,11 +80,11 @@ class PasjansApp:
         prepared_images = []
 
         for x, y, image_path in foundation_positions:
-            # Wczytaj obraz tła
+            # Wczytaj obraz tła dla aktualnego motywu
             background = Image.open(self.game_background_path).convert("RGBA")
             background = background.crop((x, y, x + 100, y + 145))  # Wytnij fragment tła
 
-            # Wczytaj obraz placeholdera
+            # Wczytaj obraz placeholdera dla aktualnego motywu
             image = Image.open(image_path).convert("RGBA")
             image = image.resize((100, 145), Image.Resampling.LANCZOS)
 

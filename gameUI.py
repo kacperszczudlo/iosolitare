@@ -147,13 +147,13 @@ class GameUI:
         for i in range(5):
             button_frame.grid_columnconfigure(i, weight=1)
 
-        self.bg_image = ImageTk.PhotoImage(file="resources/win/palermo.gif", format="gif -index 0")
+        self.bg_image = ImageTk.PhotoImage(file="resources/win/alternative/palermo.gif", format="gif -index 0")
         self.bg_label = tk.Label(self.popup, image=self.bg_image)
         self.bg_label.image = self.bg_image
         self.bg_label.place(x=0, y=45, relwidth=1, relheight=0.95)
 
-        self.play_music("resources/win/palermo.mp3")
-        self.animate_gif("resources/win/palermo.gif")
+        self.play_music("resources/soundtracks/alternative/palermo.mp3")
+        self.animate_gif("resources/win/alternative/palermo.gif")
 
         # Frame for high score input
         input_frame = tk.Frame(self.popup, bg="#5C4033")

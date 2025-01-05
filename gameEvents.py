@@ -18,7 +18,7 @@ def on_card_click(gsetup, event):
             gsetup.start_offset_x = event.x
             gsetup.start_offset_y = event.y
             gsetup.moving_cards = [card]
-            print(f"Selected card {card.figure} from foundation stack ({area['suit']}).")
+            #print(f"Selected card {card.figure} from foundation stack ({area['suit']}).")
             return
 
     # Karta w kolumnie lub stock_waste
@@ -32,7 +32,7 @@ def on_card_click(gsetup, event):
             gsetup.start_offset_x = event.x
             gsetup.start_offset_y = event.y
             gsetup.moving_cards = column[card_index:]
-            print(f"Selected card {card.figure} from column {gsetup.columns.index(column) + 1}.")
+            #print(f"Selected card {card.figure} from column {gsetup.columns.index(column) + 1}.")
             return
 
     if card in gsetup.stock_waste:
@@ -43,7 +43,7 @@ def on_card_click(gsetup, event):
         gsetup.start_offset_x = event.x
         gsetup.start_offset_y = event.y
         gsetup.moving_cards = [card]
-        print(f"Selected card {card.figure} from stock waste.")
+        #print(f"Selected card {card.figure} from stock waste.")
 
 
 def on_card_drag(gsetup, event):
@@ -77,24 +77,30 @@ def on_card_drag(gsetup, event):
                     {'x': label.winfo_x(), 'y': label.winfo_y(), 'width': 100, 'height': 145}):
                 target_card = label.card_object
                 if target_card is None:
+                    #print(f"Target card is None for label at position ({label.winfo_x()}, {label.winfo_y()}) with image {label.cget('image')}")
                     continue
 
-                if target_column_index == None:
+                if target_column_index is None:
                     target_column_index = get_column_index(gsetup, target_card)
+                    #print(f"Target column index: {target_column_index}, Target card: {target_card.figure}")
 
                 if target_card.revealed:
-                    if target_column_index is not None and target_card is not None and is_valid_move(gsetup, gsetup.selected_card, target_column_index):
-                        for card in gsetup.moving_cards:
-                            c_label = next(l for l in gsetup.card_labels if l.card_object == card)
-                            gsetup.game_ui.highlight_card(c_label, "green")
-                        overlap_detected = True
-                        break
-                    elif target_column_index is not None:
-                        for card in gsetup.moving_cards:
-                            c_label = next(l for l in gsetup.card_labels if l.card_object == card)
-                            gsetup.game_ui.highlight_card(c_label, "red")
-                        overlap_detected = True
-                        break
+                    try:
+                        if target_column_index is not None and target_card is not None and is_valid_move(gsetup, gsetup.selected_card, target_column_index):
+                            for card in gsetup.moving_cards:
+                                c_label = next(l for l in gsetup.card_labels if l.card_object == card)
+                                gsetup.game_ui.highlight_card(c_label, "green")
+                            overlap_detected = True
+                            break
+                        elif target_column_index is not None:
+                            for card in gsetup.moving_cards:
+                                c_label = next(l for l in gsetup.card_labels if l.card_object == card)
+                                gsetup.game_ui.highlight_card(c_label, "red")
+                            overlap_detected = True
+                            break
+                    except AttributeError as e:
+                        print(f"AttributeError in on_card_drag: {e}")
+                        continue
 
         for area in gsetup.upper_stack_areas:
             if rectangles_overlap(
@@ -128,7 +134,6 @@ def on_card_release(gsetup, event):
         for area in gsetup.upper_stack_areas:
             if rectangles_overlap({'x': card_x, 'y': card_y, 'width': 100, 'height': 145}, area):
                 if is_valid_upper_stack_move(gsetup.selected_card, area):
-                    # Zapis stanu PRZED zmianą
                     gsetup.save_game_state()
 
                     gsetup.move_counter += 1
@@ -142,7 +147,7 @@ def on_card_release(gsetup, event):
                             gsetup.game_ui.update_score(5)
                         else:
                             col_index = gsetup.columns.index(source_column)
-                            print(f"Column {col_index+1} is now empty.")
+                            print(f"Column {col_index + 1} is now empty.")
                     elif gsetup.selected_card in gsetup.stock_waste:
                         gsetup.stock_waste.remove(gsetup.selected_card)
                         gsetup.wyjebane.append(gsetup.selected_card)
@@ -158,7 +163,7 @@ def on_card_release(gsetup, event):
                     print(f"Moved card {gsetup.selected_card.figure} to foundation stack ({area['suit']}).")
                     valid_move = True
                     gsetup.game_ui.update_score(10)
-                    gsetup.game_ui.play_card_place_sound()  # Dodaj wywołanie funkcji dźwięku
+                    gsetup.game_ui.play_card_place_sound()
                     print("Current state of all foundation stacks:")
                     for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
                         stack_cards = [c.figure for c in stack_area['stack']]
@@ -206,7 +211,6 @@ def on_card_release(gsetup, event):
 
         if target_column is not None:
             if is_valid_move(gsetup, gsetup.selected_card, target_column):
-                # Zapis stanu PRZED zmianą, bo ruch jest poprawny
                 gsetup.save_game_state()
 
                 gsetup.move_counter += 1
@@ -255,9 +259,9 @@ def on_card_release(gsetup, event):
                     gsetup.game_ui.show_centered_box()
                 print(f"Placed card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit} in column {target_column+1}")
                 print(f"Current state of columns: {[len(col) for col in gsetup.columns]}")
-                gsetup.game_ui.play_card_place_sound()  # Dodaj wywołanie funkcji dźwięku
+                gsetup.game_ui.play_card_place_sound()
             else:
-                # Ruch niepoprawny
+                print(f"Invalid move in on_card_release: selected_card: {gsetup.selected_card.figure}, target_column: {target_column}")
                 for i, card in enumerate(gsetup.moving_cards):
                     c_label = next(l for l in gsetup.card_labels if l.card_object == card)
                     c_label.place(x=gsetup.original_x, y=gsetup.original_y + i * 30)
@@ -265,7 +269,6 @@ def on_card_release(gsetup, event):
 
                 print(f"Invalid move: {gsetup.selected_card.figure} of {gsetup.selected_card.suit}")
         else:
-            # Brak docelowej kolumny
             for i, card in enumerate(gsetup.moving_cards):
                 c_label = next(l for l in gsetup.card_labels if l.card_object == card)
                 c_label.place(x=gsetup.original_x, y=gsetup.original_y + i * 30)
@@ -277,7 +280,6 @@ def on_card_release(gsetup, event):
         gsetup.selected_card = None
         gsetup.moving_cards = []
         gsetup.game_ui.remove_highlight(event.widget)
-
 
 
 def on_stock_pile_click(gsetup, event):

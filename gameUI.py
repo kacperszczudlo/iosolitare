@@ -10,7 +10,6 @@ from gameLogic import *
 import pygame
 import threading
 
-
 class GameUI:
     def __init__(self, setup, root=None):
         self.gameSetup = setup
@@ -19,6 +18,22 @@ class GameUI:
         self.root = root
         self.added = False
         pygame.mixer.init()
+
+    def play_music(self, file_path):
+        def music():
+            pygame.mixer.init()
+            pygame.mixer.music.load(file_path)
+            pygame.mixer.music.set_volume(0.01)
+            pygame.mixer.music.play(-1)
+            while pygame.mixer.music.get_busy():
+                pygame.time.Clock().tick(10)
+
+        music_thread = threading.Thread(target=music)
+        music_thread.start()
+
+    def stop_music(self):
+        pygame.mixer.music.stop()
+
 
     def create_button(self, text, x, y, width, command=None):
         button = Button(self.gameSetup.window, text=text, font=("Arial", 12, "bold"), fg="white", bd=0, highlightthickness=0,
@@ -183,21 +198,6 @@ class GameUI:
         self.popup.destroy()
         self.gameSetup.reset_game()
         self.play_background_music()  # Ponowne odtwarzanie muzyki w tle po rozpoczęciu nowej gry
-
-    def play_music(self, file_path):
-        def music():
-            pygame.mixer.init()
-            pygame.mixer.music.load(file_path)
-            pygame.mixer.music.set_volume(0.01)
-            pygame.mixer.music.play(-1)
-            while pygame.mixer.music.get_busy():
-                pygame.time.Clock().tick(10)
-
-        music_thread = threading.Thread(target=music)
-        music_thread.start()
-
-    def stop_music(self):
-        pygame.mixer.music.stop()
 
     def play_background_music(self):
         self.play_music(self.gameSetup.app.current_background_sound)

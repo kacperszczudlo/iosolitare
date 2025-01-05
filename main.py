@@ -41,7 +41,7 @@ class PasjansApp:
         self.show_menu()
 
         pygame.mixer.init()
-        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)  # Dodaj obsługę zamknięcia głównego okna
 
     def play_background_music(self):
         pygame.mixer.music.load(self.current_background_sound)
@@ -155,6 +155,7 @@ class PasjansApp:
     def on_closing(self):
         self.stop_music()  # Zatrzymaj muzykę przed zamknięciem aplikacji
         self.root.destroy()
+
 
 if __name__ == "__main__":
     root = Tk()

@@ -2,7 +2,7 @@ import os
 from card import Card
 
 class CardDeck:
-    def __init__(self,cards_path):
+    def __init__(self, cards_path):
         # Inicjalizuje talię kart.
         self.cards = []
         self.cards_path = cards_path
@@ -16,8 +16,12 @@ class CardDeck:
                 points = idx + 1 if idx < 13 else 13
                 front_image = os.path.join(self.cards_path, f"{figure}_of_{suit}.png")
                 back_image = os.path.join(self.cards_path, "behind.png")
+                if not os.path.exists(front_image) or not os.path.exists(back_image):
+                    #print(f"Image not found for {figure} of {suit}")
+                    continue
                 card = Card(points, f"{figure} of {suit}", front_image, back_image)
                 self.cards.append(card)
+                #print(f"Initialized card: {card.figure}")
 
     def shuffle_deck(self):
         # Miesza karty w talii.
@@ -29,4 +33,5 @@ class CardDeck:
         dealt_columns = [[] for _ in range(columns)]
         for idx, card in enumerate(self.cards):
             dealt_columns[idx % columns].append(card)
+            #print(f"Dealt card: {card.figure} to column {idx % columns + 1}")
         return dealt_columns

@@ -34,8 +34,9 @@ def is_valid_move(gsetup, selected_card, target_column_index):
 
     target_card = target_column[-1]
 
-    if target_card is None:
-        return False  # Niepoprawny ruch, jeśli `target_card` jest `None`
+    if target_card is None or selected_card is None:
+        #print(f"Invalid move: either target_card or selected_card is None (target_card: {target_card}, selected_card: {selected_card})")
+        return False  # Niepoprawny ruch, jeśli `target_card` lub `selected_card` jest `None`
 
     # Skip if target_card is the same as selected_card
     if selected_card == target_card:
@@ -43,9 +44,12 @@ def is_valid_move(gsetup, selected_card, target_column_index):
     else:
         gsetup.bugfix_previous_card = target_card
 
+    #print(f"Selected card: {selected_card.figure}, Target card: {target_card.figure}")
     return (selected_card.points == target_card.points - 1 and
             ((selected_card.color == "red" and target_card.color == "black") or
              (selected_card.color == "black" and target_card.color == "red")))
+
+
 
 
 def recycle_stock_waste(gsetup):
@@ -142,8 +146,8 @@ def is_game_won(gsetup):
 
 def is_game_won(gsetup):
     #IF DO TESTOW
-    # if gsetup.game_ui.score >= 5:
-    #     return True
+    if gsetup.game_ui.score >= 5:
+        return True
     print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))
     print("END GAME DEBUG Ilosc kart w stock_waste: ", len(gsetup.stock_waste))
     lista = []

@@ -11,7 +11,6 @@ import pygame
 import threading
 
 
-
 class GameUI:
     def __init__(self, setup, root=None):
         self.gameSetup = setup
@@ -19,6 +18,13 @@ class GameUI:
         self.pause = False
         self.root = root
         self.added = False
+        pygame.mixer.init()
+
+    def play_card_place_sound(self):
+        card_place_sound = pygame.mixer.Sound(self.gameSetup.app.current_card_place_sound)
+        card_place_sound.set_volume(0.5)  # Ustaw poziom głośności
+        card_place_sound.play()
+
 
     def create_button(self, text, x, y, width, command=None):
         button = Button(self.gameSetup.window, text=text, font=("Arial", 12, "bold"), fg="white", bd=0, highlightthickness=0,

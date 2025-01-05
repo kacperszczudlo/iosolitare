@@ -58,18 +58,34 @@ class Settings(tk.Toplevel):
 
         self.update_previews()
 
+
     def change_soundtrack(self):
         self.soundtrack_index = (self.soundtrack_index + 1) % len(self.soundtracks)
         soundtrack_name, soundtrack, gif = self.soundtracks[self.soundtrack_index]
 
-        self.app.current_soundtrack = soundtrack
+        if soundtrack_name == 'default':
+            self.app.current_card_place_sound = 'D:/iosolitare/resources/soundtracks/default/cas_music.mp3'
+            self.app.current_victory_sound = 'D:/iosolitare/resources/soundtracks/default/default.mp3'
+            self.app.current_background_sound = 'D:/iosolitare/resources/soundtracks/default/cas_music.mp3'
+        elif soundtrack_name == 'alternative':
+            self.app.current_card_place_sound = 'D:/iosolitare/resources/soundtracks/alternative/augh.mp3'
+            self.app.current_victory_sound = 'D:/iosolitare/resources/soundtracks/alternative/palermo.mp3'
+            self.app.current_background_sound = 'D:/iosolitare/resources/soundtracks/alternative/temperatura.mp3'
+
         self.app.current_gif = gif
 
-        print(f"Ścieżka dźwiękowa zmieniona na: {self.app.current_soundtrack}")
+        print(f"Ścieżka dźwiękowa zmieniona na: {soundtrack_name}")
         print(f"GIF zmieniony na: {self.app.current_gif}")
 
         self.soundtrack_preview.config(text=soundtrack_name)
         self.update_previews()
+
+        # Zatrzymaj bieżącą muzykę tła i uruchom nową
+        self.app.stop_background_music()
+        self.app.play_background_music()
+
+
+
 
     def update_previews(self):
         # Aktualizuj podgląd dla motywu kart
@@ -78,14 +94,14 @@ class Settings(tk.Toplevel):
         card_back_image = self.load_image(card_back_path, (50, 70))
         card_king_image = self.load_image(card_king_path, (50, 70))
         self.card_back_preview.config(image=card_back_image)
-        self.card_back_preview.image = card_back_image  # Zachowaj referencję, aby zapobiec odświeżaniu obrazu
+        self.card_back_preview.image = card_back_image
         self.card_king_preview.config(image=card_king_image)
-        self.card_king_preview.image = card_king_image  # Zachowaj referencję, aby zapobiec odświeżaniu obrazu
+        self.card_king_preview.image = card_king_image
 
         # Aktualizuj podgląd dla tła
         background_image = self.load_image(self.app.game_background_path, (100, 50))
         self.background_preview.config(image=background_image)
-        self.background_preview.image = background_image  # Zachowaj referencję, aby zapobiec odświeżaniu obrazu
+        self.background_preview.image = background_image
 
     def change_theme(self):
         if self.app.current_theme == "alternative":

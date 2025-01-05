@@ -153,6 +153,7 @@ def on_card_release(gsetup, event):
                     print(f"Moved card {gsetup.selected_card.figure} to foundation stack ({area['suit']}).")
                     valid_move = True
                     gsetup.game_ui.update_score(10)
+                    gsetup.game_ui.play_card_place_sound()  # Dodaj wywołanie funkcji dźwięku
                     print("Current state of all foundation stacks:")
                     for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
                         stack_cards = [c.figure for c in stack_area['stack']]
@@ -252,6 +253,7 @@ def on_card_release(gsetup, event):
                     gsetup.game_ui.show_centered_box()
                 print(f"Placed card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit} in column {target_column+1}")
                 print(f"Current state of columns: {[len(col) for col in gsetup.columns]}")
+                gsetup.game_ui.play_card_place_sound()  # Dodaj wywołanie funkcji dźwięku
             else:
                 # Ruch niepoprawny
                 for i, card in enumerate(gsetup.moving_cards):
@@ -273,6 +275,7 @@ def on_card_release(gsetup, event):
         gsetup.selected_card = None
         gsetup.moving_cards = []
         gsetup.game_ui.remove_highlight(event.widget)
+
 
 
 def on_stock_pile_click(gsetup, event):

@@ -1,10 +1,12 @@
 import os
 from tkinter import *
 from PIL import Image, ImageTk
+import pygame
 from settings import Settings
 from gameLogic import get_highscore
 from gameSetup import GameSetup
 from gameUI import GameUI
+
 
 class PasjansApp:
     def __init__(self, root):
@@ -16,9 +18,11 @@ class PasjansApp:
         self.resources_dir = os.path.join(self.script_dir, 'resources')
         self.cards_dir = os.path.join(self.resources_dir, 'cards', 'default')
 
-        self.current_theme = "default"  # Zmieniony na default
-        self.current_gif = 'resources/win/default/fireworks.jpg'  # Dodany domyślny GIF
-        self.current_soundtrack = 'resources/soundtracks/default/default.mp3'  # Dodany domyślny dźwięk
+        self.current_theme = "default"
+        self.current_gif = 'resources/win/default/fireworks.jpg'
+        self.current_background_sound = 'D:/iosolitare/resources/soundtracks/default/cas_music.mp3'
+        self.current_card_place_sound = 'D:/iosolitare/resources/soundtracks/default/swipe.mp3'
+        self.current_victory_sound = 'D:/iosolitare/resources/soundtracks/default/default.mp3'
         self.game_background_path = os.path.join(self.resources_dir, 'background', 'default_background.jpg')
 
         self.menu_background_path = os.path.join(self.script_dir, 'resources', 'menu', 'menu.jpg')
@@ -35,6 +39,20 @@ class PasjansApp:
 
         self.current_frame = None
         self.show_menu()
+
+        pygame.mixer.init()
+        self.play_background_music()
+
+    def play_background_music(self):
+        pygame.mixer.music.load(self.current_background_sound)
+        pygame.mixer.music.set_volume(0.1)
+        pygame.mixer.music.play(-1)
+
+    def stop_background_music(self):
+        pygame.mixer.music.stop()
+
+
+
 
     def show_menu(self):
         if self.current_frame:
@@ -82,7 +100,6 @@ class PasjansApp:
         background_label = Label(self.current_frame, image=self.game_background_image)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-        # Wyświetlanie przygotowanych obrazów stosów końcowych
         foundation_positions = [
             (550, 153),
             (690, 153),
@@ -92,11 +109,11 @@ class PasjansApp:
 
         for (x, y), tk_image in zip(foundation_positions, self.prepared_foundation_images):
             label = Label(self.current_frame, image=tk_image, bd=0)
-            label.image = tk_image  # Zachowaj referencję do obrazu
+            label.image = tk_image
             label.place(x=x, y=y)
 
         game_setup = GameSetup(self.root, self.resources_dir, self.cards_dir)
-        game_setup.app = self  # Dodaj ten wiersz, aby gameSetup miało odniesienie do app
+        game_setup.app = self
         user_interface = GameUI(game_setup, self.root)
 
         user_interface.create_button("Nowa gra", 130, 16, 119, game_setup.reset_game)

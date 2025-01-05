@@ -41,13 +41,14 @@ class PasjansApp:
         self.show_menu()
 
         pygame.mixer.init()
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def play_background_music(self):
         pygame.mixer.music.load(self.current_background_sound)
         pygame.mixer.music.set_volume(0.01)
         pygame.mixer.music.play(-1)
 
-    def stop_background_music(self):
+    def stop_music(self):
         pygame.mixer.music.stop()
 
     def show_menu(self):
@@ -147,10 +148,13 @@ class PasjansApp:
         for x, y in [(130, 153), (270, 153), (130, 378), (270, 378), (410, 378), (550, 378), (690, 378), (830, 378), (970, 378)]:
             user_interface.create_placeholder(x, y)
 
-        self.stop_background_music()  # Zatrzymaj bieżącą muzykę tła przed rozpoczęciem nowej gry
+        self.stop_music()  # Zatrzymaj bieżącą muzykę tła przed rozpoczęciem nowej gry
         game_setup.reset_game()
         self.play_background_music()  # Uruchom muzykę tła po rozpoczęciu nowej gry
 
+    def on_closing(self):
+        self.stop_music()  # Zatrzymaj muzykę przed zamknięciem aplikacji
+        self.root.destroy()
 
 if __name__ == "__main__":
     root = Tk()

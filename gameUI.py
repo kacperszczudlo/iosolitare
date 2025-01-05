@@ -152,7 +152,8 @@ class GameUI:
         self.bg_label.image = self.bg_image
         self.bg_label.place(x=0, y=45, relwidth=1, relheight=0.95)
 
-        self.play_music(self.gameSetup.app.current_soundtrack)
+        self.stop_music()  # Zatrzymaj muzykę w tle
+        self.play_music(self.gameSetup.app.current_victory_sound)  # Zagraj dźwięk zwycięstwa
         self.animate_gif(self.gameSetup.app.current_gif)
 
         # Frame for high score input
@@ -173,8 +174,35 @@ class GameUI:
 
     def on_close(self):
         self.stop_music()
+        self.play_background_music()  # Ponowne odtwarzanie muzyki w tle
         self.popup.destroy()
         self.gameSetup.window.attributes('-disabled', False)
+
+    def restart(self):
+        self.stop_music()
+        self.popup.destroy()
+        self.gameSetup.reset_game()
+        self.play_background_music()  # Ponowne odtwarzanie muzyki w tle po rozpoczęciu nowej gry
+
+    def play_music(self, file_path):
+        def music():
+            pygame.mixer.init()
+            pygame.mixer.music.load(file_path)
+            pygame.mixer.music.set_volume(0.01)
+            pygame.mixer.music.play(-1)
+            while pygame.mixer.music.get_busy():
+                pygame.time.Clock().tick(10)
+
+        music_thread = threading.Thread(target=music)
+        music_thread.start()
+
+    def stop_music(self):
+        pygame.mixer.music.stop()
+
+    def play_background_music(self):
+        self.play_music(self.gameSetup.app.current_background_sound)
+
+
 
     def animate_gif(self, filepath):
         self.frames = []
@@ -200,12 +228,6 @@ class GameUI:
         self.gameSetup.window.attributes('-disabled', False)
         self.popup.destroy()
 
-    def restart(self):
-        self.gameSetup.window.attributes('-disabled', False)
-        self.popup.destroy()
-        self.gameSetup.reset_game()
-        self.stop_music()
-
     def animate_popup(self,initial_width, initial_height, final_width, final_height, x, y):
         current_width = initial_width
         current_height = initial_height
@@ -222,20 +244,7 @@ class GameUI:
 
         step()
 
-    def play_music(self,file_path):
-        def music():
-            pygame.mixer.init()
-            pygame.mixer.music.load(file_path)
-            pygame.mixer.music.set_volume(0.01)
-            pygame.mixer.music.play(-1)
-            while pygame.mixer.music.get_busy():
-                pygame.time.Clock().tick(10)
 
-        music_thread = threading.Thread(target=music)
-        music_thread.start()
-
-    def stop_music(self):
-        pygame.mixer.music.stop()
         
     def play_card_place_sound(self):
         card_place_sound = pygame.mixer.Sound(self.gameSetup.app.current_card_place_sound)

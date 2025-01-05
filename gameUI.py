@@ -20,12 +20,6 @@ class GameUI:
         self.added = False
         pygame.mixer.init()
 
-    def play_card_place_sound(self):
-        card_place_sound = pygame.mixer.Sound(self.gameSetup.app.current_card_place_sound)
-        card_place_sound.set_volume(0.5)  # Ustaw poziom głośności
-        card_place_sound.play()
-
-
     def create_button(self, text, x, y, width, command=None):
         button = Button(self.gameSetup.window, text=text, font=("Arial", 12, "bold"), fg="white", bd=0, highlightthickness=0,
                         bg="#5C4033", state="normal", command=command)
@@ -245,6 +239,11 @@ class GameUI:
 
     def stop_music(self):
         pygame.mixer.music.stop()
+        
+    def play_card_place_sound(self):
+        card_place_sound = pygame.mixer.Sound(self.gameSetup.app.current_card_place_sound)
+        card_place_sound.set_volume(0.5)  # Ustaw poziom głośności
+        card_place_sound.play()
 
     def show_highscore(self):
         # Temporarily release grab

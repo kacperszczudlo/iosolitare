@@ -83,7 +83,7 @@ def on_card_drag(gsetup, event):
                     target_column_index = get_column_index(gsetup, target_card)
 
                 if target_card.revealed:
-                    if target_column_index is not None and is_valid_move(gsetup, gsetup.selected_card, target_column_index):
+                    if target_column_index is not None and target_card is not None and is_valid_move(gsetup, gsetup.selected_card, target_column_index):
                         for card in gsetup.moving_cards:
                             c_label = next(l for l in gsetup.card_labels if l.card_object == card)
                             gsetup.game_ui.highlight_card(c_label, "green")
@@ -111,6 +111,7 @@ def on_card_drag(gsetup, event):
             for card in gsetup.moving_cards:
                 c_label = next(l for l in gsetup.card_labels if l.card_object == card)
                 gsetup.game_ui.highlight_card(c_label, "black")
+
 
         # print(f"Dragging card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit}")
 

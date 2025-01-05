@@ -43,10 +43,10 @@ def is_valid_move(gsetup, selected_card, target_column_index):
     else:
         gsetup.bugfix_previous_card = target_card
 
-    return (selected_card.points == target_card.points - 1 and
+    return (target_card and
+            selected_card.points == target_card.points - 1 and
             ((selected_card.color == "red" and target_card.color == "black") or
              (selected_card.color == "black" and target_card.color == "red")))
-
 
 
 def recycle_stock_waste(gsetup):

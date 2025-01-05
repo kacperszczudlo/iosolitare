@@ -20,9 +20,9 @@ class PasjansApp:
 
         self.current_theme = "default"
         self.current_gif = 'resources/win/default/fireworks.jpg'
-        self.current_background_sound = 'resources/soundtracks/default/cas_music.mp3'
-        self.current_card_place_sound = 'resources/soundtracks/default/swipe.mp3'
-        self.current_victory_sound = 'resources/soundtracks/default/default.mp3'
+        self.current_background_sound = 'D:/iosolitare/resources/soundtracks/default/cas_music.mp3'
+        self.current_card_place_sound = 'D:/iosolitare/resources/soundtracks/default/cas_music.mp3'
+        self.current_victory_sound = 'D:/iosolitare/resources/soundtracks/default/default.mp3'
         self.game_background_path = os.path.join(self.resources_dir, 'background', 'default_background.jpg')
 
         self.menu_background_path = os.path.join(self.script_dir, 'resources', 'menu', 'menu.jpg')
@@ -50,6 +50,7 @@ class PasjansApp:
 
     def stop_background_music(self):
         pygame.mixer.music.stop()
+
 
 
 

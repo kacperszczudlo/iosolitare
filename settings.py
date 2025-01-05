@@ -7,7 +7,7 @@ class Settings(tk.Toplevel):
         super().__init__(parent)
         self.app = app
         if not show:
-            self.withdraw()  # Ukryj okno jeśli `show` jest ustawione na False
+            self.withdraw()
         self.title("Settings")
         self.geometry("375x250")
         self.resizable(False, False)
@@ -64,23 +64,23 @@ class Settings(tk.Toplevel):
         soundtrack_name, soundtrack, gif = self.soundtracks[self.soundtrack_index]
 
         if soundtrack_name == 'default':
-            self.app.current_card_place_sound = 'resources/soundtracks/default/swipe.mp3'
-            self.app.current_victory_sound = 'resources/soundtracks/default/default.mp3'
-            self.app.current_background_sound = 'resources/soundtracks/default/cas_music.mp3'
+            self.app.current_card_place_sound = 'D:/iosolitare/resources/soundtracks/default/cas_music.mp3'
+            self.app.current_victory_sound = 'D:/iosolitare/resources/soundtracks/default/default.mp3'
+            self.app.current_background_sound = 'D:/iosolitare/resources/soundtracks/default/cas_music.mp3'
         elif soundtrack_name == 'alternative':
-            self.app.current_card_place_sound = 'resources/soundtracks/alternative/augh.mp3'
-            self.app.current_victory_sound = 'resources/soundtracks/alternative/palermo.mp3'
-            self.app.current_background_sound = 'resources/soundtracks/alternative/temperatura.mp3'
+            self.app.current_card_place_sound = 'D:/iosolitare/resources/soundtracks/alternative/augh.mp3'
+            self.app.current_victory_sound = 'D:/iosolitare/resources/soundtracks/alternative/palermo.mp3'
+            self.app.current_background_sound = 'D:/iosolitare/resources/soundtracks/alternative/temperatura.mp3'
 
         self.app.current_gif = gif
 
-        print(f"Ścieżka dźwiękowa zmieniona na: {soundtrack_name}")
-        print(f"GIF zmieniony na: {self.app.current_gif}")
+        print(f"Soundtrack changed to: {soundtrack_name}")
+        print(f"GIF changed to: {self.app.current_gif}")
 
         self.soundtrack_preview.config(text=soundtrack_name)
         self.update_previews()
 
-        # Zatrzymaj bieżącą muzykę tła i uruchom nową
+        # Restart background music
         self.app.stop_background_music()
         self.app.play_background_music()
 

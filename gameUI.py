@@ -171,7 +171,6 @@ class GameUI:
 
         self.popup.protocol("WM_DELETE_WINDOW", self.on_close)
 
-
     def on_close(self):
         self.stop_music()
         self.popup.destroy()
@@ -196,7 +195,6 @@ class GameUI:
 
         update_frame()
 
-
     def close_overlay(self):
 
         self.gameSetup.window.attributes('-disabled', False)
@@ -207,7 +205,6 @@ class GameUI:
         self.popup.destroy()
         self.gameSetup.reset_game()
         self.stop_music()
-
 
     def animate_popup(self,initial_width, initial_height, final_width, final_height, x, y):
         current_width = initial_width

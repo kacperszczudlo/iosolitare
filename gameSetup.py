@@ -10,9 +10,10 @@ import gameEvents
 import copy
 
 class GameSetup:
-    def __init__(self, window,resources_dir, cards_dir):
+    def __init__(self, window, resources_dir, cards_dir, app):
         self.resources_dir = resources_dir
         self.cards_dir = cards_dir
+        self.app = app
         self.bugfix_previous_card = None
         self.previous_state = None
         self.window = window
@@ -75,7 +76,7 @@ class GameSetup:
             if not ignore:
                 return
 
-        self.game_ui = gameUI.GameUI(self)
+        self.game_ui = GameUI(self)
         self.game_ui.display_initial_deal(columns)
         self.game_ui.display_stock_pile()
 
@@ -83,6 +84,9 @@ class GameSetup:
         self.game_ui.init_score()
         self.game_ui.start_timer()
         self.game_ui.update_move_counter(self.move_counter)
+
+
+
 
     def update_lower_stack_areas(self):
         placeholder_positions = [

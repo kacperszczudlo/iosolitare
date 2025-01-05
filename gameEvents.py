@@ -76,6 +76,9 @@ def on_card_drag(gsetup, event):
                     {'x': gsetup.start_x, 'y': gsetup.start_y, 'width': 100, 'height': 145 + 30*(len(gsetup.moving_cards)-1)},
                     {'x': label.winfo_x(), 'y': label.winfo_y(), 'width': 100, 'height': 145}):
                 target_card = label.card_object
+                if target_card is None:
+                    continue
+
                 if target_column_index == None:
                     target_column_index = get_column_index(gsetup, target_card)
 
@@ -108,6 +111,7 @@ def on_card_drag(gsetup, event):
             for card in gsetup.moving_cards:
                 c_label = next(l for l in gsetup.card_labels if l.card_object == card)
                 gsetup.game_ui.highlight_card(c_label, "black")
+
         # print(f"Dragging card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit}")
 
 
@@ -198,7 +202,7 @@ def on_card_release(gsetup, event):
                     {'x': card_x, 'y': card_y, 'width':100,'height':145}, last_card_position):
                     target_column = col_index
                     break
-        # print(f"DEBUG TARGET COLUMN: {target_column} ")
+
         if target_column is not None:
             if is_valid_move(gsetup, gsetup.selected_card, target_column):
                 # Zapis stanu PRZED zmianą, bo ruch jest poprawny
@@ -212,11 +216,8 @@ def on_card_release(gsetup, event):
                     for card in gsetup.moving_cards:
                         source_column.remove(card)
                 elif gsetup.selected_card in gsetup.stock_waste:
-                    # print(f"TEST BUGA1 {gsetup.selected_card}")
                     gsetup.stock_waste.remove(gsetup.selected_card)
                     gsetup.wyjebane.append(gsetup.selected_card)
-                    # gsetup.deck.cards.remove(gsetup.selected_card)
-                    print(gsetup.stock_waste)
                 gsetup.columns[target_column].extend(gsetup.moving_cards)
                 for i, card in enumerate(gsetup.moving_cards):
                     card_label = next(l for l in gsetup.card_labels if l.card_object == card)

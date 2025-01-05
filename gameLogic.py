@@ -33,8 +33,10 @@ def is_valid_move(gsetup, selected_card, target_column_index):
         return selected_card.figure.lower().startswith("king")
 
     target_card = target_column[-1]
-    # print(
-    #     f"DEBUG: Checking move: {selected_card.figure} ({selected_card.id}) to {target_card.figure} ({target_card.id})")
+
+    if target_card is None:
+        return False  # Niepoprawny ruch, jeśli `target_card` jest `None`
+
     # Skip if target_card is the same as selected_card
     if selected_card == target_card:
         target_card = gsetup.bugfix_previous_card
@@ -44,6 +46,8 @@ def is_valid_move(gsetup, selected_card, target_column_index):
     return (selected_card.points == target_card.points - 1 and
             ((selected_card.color == "red" and target_card.color == "black") or
              (selected_card.color == "black" and target_card.color == "red")))
+
+
 
 def recycle_stock_waste(gsetup):
     # Przenoszenie kart z powrotem do stosu dobieralnego

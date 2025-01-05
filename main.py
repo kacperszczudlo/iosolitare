@@ -21,7 +21,7 @@ class PasjansApp:
         self.current_theme = "default"
         self.current_gif = 'resources/win/default/fireworks.jpg'
         self.current_background_sound = 'resources/soundtracks/default/cas_music.mp3'
-        self.current_card_place_sound = 'resources/soundtracks/default/cas_music.mp3'
+        self.current_card_place_sound = 'resources/soundtracks/default/swipe.mp3'
         self.current_victory_sound = 'resources/soundtracks/default/default.mp3'
         self.game_background_path = os.path.join(self.resources_dir, 'background', 'default_background.jpg')
 
@@ -41,11 +41,10 @@ class PasjansApp:
         self.show_menu()
 
         pygame.mixer.init()
-        self.play_background_music()
 
     def play_background_music(self):
         pygame.mixer.music.load(self.current_background_sound)
-        pygame.mixer.music.set_volume(0.1)
+        pygame.mixer.music.set_volume(0.05)
         pygame.mixer.music.play(-1)
 
     def stop_background_music(self):
@@ -62,7 +61,7 @@ class PasjansApp:
         corona_label = Label(self.current_frame, image=self.corona_image)
         corona_label.place(x=500, y=300)
 
-        temp_game_ui = GameUI(GameSetup(self.root, self.resources_dir, self.cards_dir))
+        temp_game_ui = GameUI(GameSetup(self.root, self.resources_dir, self.cards_dir, app=self), self.root)
         button_width = 200
         menu_button_y = 400
         button_font = ("Arial", 12, "bold")
@@ -87,44 +86,6 @@ class PasjansApp:
 
         rules_label = Label(rules_window, text=rules_text, font=("Arial", 12), justify=LEFT, wraplength=580)
         rules_label.pack(pady=20, padx=20, fill=BOTH, expand=True)
-
-    def start_game(self):
-        if self.current_frame:
-            self.current_frame.destroy()
-        self.current_frame = Frame(self.root)
-        self.current_frame.pack(fill="both", expand=True)
-
-        background_label = Label(self.current_frame, image=self.game_background_image)
-        background_label.place(x=0, y=0, relwidth=1, relheight=1)
-
-        foundation_positions = [
-            (550, 153),
-            (690, 153),
-            (830, 153),
-            (970, 153),
-        ]
-
-        for (x, y), tk_image in zip(foundation_positions, self.prepared_foundation_images):
-            label = Label(self.current_frame, image=tk_image, bd=0)
-            label.image = tk_image
-            label.place(x=x, y=y)
-
-        game_setup = GameSetup(self.root, self.resources_dir, self.cards_dir)
-        game_setup.app = self
-        user_interface = GameUI(game_setup, self.root)
-
-        user_interface.create_button("Nowa gra", 130, 16, 119, game_setup.reset_game)
-        user_interface.create_button("Cofnij", 265, 16, 119, game_setup.undo_move)
-        user_interface.create_label("Punkty: 0", 711, 16, 119)
-        user_interface.create_label("Ruchy: 0", 846, 16, 119)
-        user_interface.create_label("Czas: 00:00", 981, 16, 119)
-        user_interface.create_button("Najlepsze wyniki", 16, 753, 200)
-
-        for x, y in [(130, 153), (270, 153), (130, 378), (270, 378), (410, 378), (550, 378), (690, 378), (830, 378), (970, 378)]:
-            user_interface.create_placeholder(x, y)
-
-        game_setup.reset_game()
-
 
     def show_highscore(self):
         wyniki = get_highscore()
@@ -151,6 +112,45 @@ class PasjansApp:
     def show_settings(self):
         settings = Settings(self.root, self)
         settings.grab_set()
+
+    def start_game(self):
+        if self.current_frame:
+            self.current_frame.destroy()
+        self.current_frame = Frame(self.root)
+        self.current_frame.pack(fill="both", expand=True)
+
+        background_label = Label(self.current_frame, image=self.game_background_image)
+        background_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+        foundation_positions = [
+            (550, 153),
+            (690, 153),
+            (830, 153),
+            (970, 153),
+        ]
+
+        for (x, y), tk_image in zip(foundation_positions, self.prepared_foundation_images):
+            label = Label(self.current_frame, image=tk_image, bd=0)
+            label.image = tk_image
+            label.place(x=x, y=y)
+
+        game_setup = GameSetup(self.root, self.resources_dir, self.cards_dir, app=self)
+        user_interface = GameUI(game_setup, self.root)
+
+        user_interface.create_button("Nowa gra", 130, 16, 119, game_setup.reset_game)
+        user_interface.create_button("Cofnij", 265, 16, 119, game_setup.undo_move)
+        user_interface.create_label("Punkty: 0", 711, 16, 119)
+        user_interface.create_label("Ruchy: 0", 846, 16, 119)
+        user_interface.create_label("Czas: 00:00", 981, 16, 119)
+        user_interface.create_button("Najlepsze wyniki", 16, 753, 200)
+
+        for x, y in [(130, 153), (270, 153), (130, 378), (270, 378), (410, 378), (550, 378), (690, 378), (830, 378), (970, 378)]:
+            user_interface.create_placeholder(x, y)
+
+        self.stop_background_music()  # Zatrzymaj bieżącą muzykę tła przed rozpoczęciem nowej gry
+        game_setup.reset_game()
+        self.play_background_music()  # Uruchom muzykę tła po rozpoczęciu nowej gry
+
 
 if __name__ == "__main__":
     root = Tk()

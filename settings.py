@@ -64,13 +64,13 @@ class Settings(tk.Toplevel):
         soundtrack_name, soundtrack, gif = self.soundtracks[self.soundtrack_index]
 
         if soundtrack_name == 'default':
-            self.app.current_card_place_sound = 'D:/iosolitare/resources/soundtracks/default/cas_music.mp3'
-            self.app.current_victory_sound = 'D:/iosolitare/resources/soundtracks/default/default.mp3'
-            self.app.current_background_sound = 'D:/iosolitare/resources/soundtracks/default/cas_music.mp3'
+            self.app.current_card_place_sound = 'resources/soundtracks/default/swipe.mp3'
+            self.app.current_victory_sound = 'resources/soundtracks/default/default.mp3'
+            self.app.current_background_sound = 'resources/soundtracks/default/cas_music.mp3'
         elif soundtrack_name == 'alternative':
-            self.app.current_card_place_sound = 'D:/iosolitare/resources/soundtracks/alternative/augh.mp3'
-            self.app.current_victory_sound = 'D:/iosolitare/resources/soundtracks/alternative/palermo.mp3'
-            self.app.current_background_sound = 'D:/iosolitare/resources/soundtracks/alternative/temperatura.mp3'
+            self.app.current_card_place_sound = 'resources/soundtracks/alternative/augh.mp3'
+            self.app.current_victory_sound = 'resources/soundtracks/alternative/palermo.mp3'
+            self.app.current_background_sound = 'resources/soundtracks/alternative/temperatura.mp3'
 
         self.app.current_gif = gif
 
@@ -79,13 +79,6 @@ class Settings(tk.Toplevel):
 
         self.soundtrack_preview.config(text=soundtrack_name)
         self.update_previews()
-
-        # Restart background music
-        self.app.stop_background_music()
-        self.app.play_background_music()
-
-
-
 
     def update_previews(self):
         # Aktualizuj podgląd dla motywu kart

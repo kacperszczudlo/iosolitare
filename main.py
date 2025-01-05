@@ -44,7 +44,7 @@ class PasjansApp:
 
     def play_background_music(self):
         pygame.mixer.music.load(self.current_background_sound)
-        pygame.mixer.music.set_volume(0.05)
+        pygame.mixer.music.set_volume(0.01)
         pygame.mixer.music.play(-1)
 
     def stop_background_music(self):

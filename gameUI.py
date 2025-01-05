@@ -226,7 +226,7 @@ class GameUI:
         def music():
             pygame.mixer.init()
             pygame.mixer.music.load(file_path)
-            pygame.mixer.music.set_volume(0.05)
+            pygame.mixer.music.set_volume(0.01)
             pygame.mixer.music.play(-1)
             while pygame.mixer.music.get_busy():
                 pygame.time.Clock().tick(10)
@@ -239,7 +239,7 @@ class GameUI:
         
     def play_card_place_sound(self):
         card_place_sound = pygame.mixer.Sound(self.gameSetup.app.current_card_place_sound)
-        card_place_sound.set_volume(0.5)  # Ustaw poziom głośności
+        card_place_sound.set_volume(0.01)  # Ustaw poziom głośności
         card_place_sound.play()
 
     def show_highscore(self):

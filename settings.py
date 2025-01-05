@@ -64,7 +64,7 @@ class Settings(tk.Toplevel):
         soundtrack_name, soundtrack, gif = self.soundtracks[self.soundtrack_index]
 
         if soundtrack_name == 'default':
-            self.app.current_card_place_sound = 'D:/iosolitare/resources/soundtracks/default/cas_music.mp3'
+            self.app.current_card_place_sound = 'D:/iosolitare/resources/soundtracks/default/swipe.mp3'
             self.app.current_victory_sound = 'D:/iosolitare/resources/soundtracks/default/default.mp3'
             self.app.current_background_sound = 'D:/iosolitare/resources/soundtracks/default/cas_music.mp3'
         elif soundtrack_name == 'alternative':

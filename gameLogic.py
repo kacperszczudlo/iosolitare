@@ -43,8 +43,7 @@ def is_valid_move(gsetup, selected_card, target_column_index):
     else:
         gsetup.bugfix_previous_card = target_card
 
-    return (target_card and
-            selected_card.points == target_card.points - 1 and
+    return (selected_card.points == target_card.points - 1 and
             ((selected_card.color == "red" and target_card.color == "black") or
              (selected_card.color == "black" and target_card.color == "red")))
 
@@ -143,8 +142,8 @@ def is_game_won(gsetup):
 
 def is_game_won(gsetup):
     #IF DO TESTOW
-    if gsetup.game_ui.score >= 5:
-        return True
+    # if gsetup.game_ui.score >= 5:
+    #     return True
     print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))
     print("END GAME DEBUG Ilosc kart w stock_waste: ", len(gsetup.stock_waste))
     lista = []

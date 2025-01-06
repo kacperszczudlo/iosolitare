@@ -10,22 +10,24 @@ import gameEvents
 import copy
 
 class GameSetup:
-    def __init__(self, window):
+    def __init__(self, window, resources_dir, cards_dir, app):
+        self.resources_dir = resources_dir
+        self.cards_dir = cards_dir
+        self.app = app
         self.bugfix_previous_card = None
         self.previous_state = None
         self.window = window
         self.card_labels = []
-        self.deck = CardDeck()
+        self.deck = CardDeck(self.cards_dir)
         self.card_positions = []
         self.stock_pile = []
         self.stock_waste = []
         self.move_counter = 0
         self.selected_card = None
         self.game_ui = GameUI(self)
+        self.wyjebane = []
         self.columns = [[] for _ in range(7)]
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        self.resources_dir = os.path.join(script_dir, 'resources')
-        self.cards_dir = os.path.join(self.resources_dir, 'cards')
+
         self.lower_stack_areas = [
             {'x': 130, 'y': 378, 'width': 100, 'height': 145},
             {'x': 270, 'y': 378, 'width': 100, 'height': 145},
@@ -47,7 +49,7 @@ class GameSetup:
         for label in self.card_labels:
             label.place_forget()
         self.card_labels.clear()
-        self.deck = CardDeck()
+        self.deck = CardDeck(self.cards_dir)
         self.deck.shuffle_deck()
         self.first_deal = FirstDeal(self.deck)
         self.stock_pile = self.deck.cards[28:]
@@ -74,7 +76,7 @@ class GameSetup:
             if not ignore:
                 return
 
-        self.game_ui = gameUI.GameUI(self)
+        self.game_ui = GameUI(self)
         self.game_ui.display_initial_deal(columns)
         self.game_ui.display_stock_pile()
 
@@ -82,6 +84,9 @@ class GameSetup:
         self.game_ui.init_score()
         self.game_ui.start_timer()
         self.game_ui.update_move_counter(self.move_counter)
+
+
+
 
     def update_lower_stack_areas(self):
         placeholder_positions = [
@@ -189,7 +194,7 @@ class GameSetup:
                 card_label.bind("<ButtonPress-1>", partial(gameEvents.on_card_click, self))
                 card_label.bind("<B1-Motion>", partial(gameEvents.on_card_drag, self))
                 card_label.bind("<ButtonRelease-1>", partial(gameEvents.on_card_release, self))
-                card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self))
+                # card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self))
                 self.card_labels.append(card_label)
                 update_card_position(self, card, x_position, y_offset + row * y_spacing)
 
@@ -208,7 +213,7 @@ class GameSetup:
             card_label.bind("<ButtonPress-1>", partial(gameEvents.on_card_click, self))
             card_label.bind("<B1-Motion>", partial(gameEvents.on_card_drag, self))
             card_label.bind("<ButtonRelease-1>", partial(gameEvents.on_card_release, self))
-            card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self))
+            # card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self))
             self.card_labels.append(card_label)
             update_card_position(self, card, waste_x, waste_y)
 
@@ -220,7 +225,7 @@ class GameSetup:
                 card_label.bind("<ButtonPress-1>", partial(gameEvents.on_card_click, self))
                 card_label.bind("<B1-Motion>", partial(gameEvents.on_card_drag, self))
                 card_label.bind("<ButtonRelease-1>", partial(gameEvents.on_card_release, self))
-                card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self))
+                # card_label.bind("<Double-1>", partial(gameEvents.on_card_double_click, self))
                 self.card_labels.append(card_label)
                 update_card_position(self, top_card, area['x'], area['y'])
 

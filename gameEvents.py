@@ -1,6 +1,7 @@
 from tkinter import Button
 from functools import partial
 from gameLogic import *
+from PIL import Image, ImageTk
 def on_card_click(gsetup, event):
     if is_game_won(gsetup):
         award_points_for_lower_columns(gsetup)
@@ -282,6 +283,7 @@ def on_card_release(gsetup, event):
                     gsetup.game_ui.show_centered_box()
                 print(f"Placed card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit} in column {target_column + 1}")
                 print(f"Current state of columns: {[len(col) for col in gsetup.columns]}")
+                check_and_resize_cards(gsetup)
                 gsetup.game_ui.play_card_place_sound()
             else:
                 print(f"Invalid move in on_card_release: selected_card: {gsetup.selected_card.figure}, target_column: {target_column}")
@@ -305,6 +307,40 @@ def on_card_release(gsetup, event):
         gsetup.game_ui.remove_highlight(event.widget)
 
 
+def resize_all_cards(gsetup, width, height):
+    for card_label in gsetup.card_labels:
+        card = card_label.card_object  # Obiekt karty
+        if hasattr(card, "front_image") and card.revealed:
+            # Załaduj oryginalny obraz
+            original_image = Image.open(card.front_image)
+
+            # Zmień rozmiar obrazu
+            resized_image = original_image.resize((width, height), Image.Resampling.LANCZOS)
+
+            # Zaktualizuj obraz w widżecie
+            card_label.image = ImageTk.PhotoImage(resized_image)
+            card_label.config(image=card_label.image)
+
+        if hasattr(card, "back_image") and not card.revealed:
+            # Załaduj oryginalny obraz
+            original_image = Image.open(card.back_image)
+
+            # Zmień rozmiar obrazu
+            resized_image = original_image.resize((width, height), Image.Resampling.LANCZOS)
+
+            # Zaktualizuj obraz w widżecie
+            card_label.image = ImageTk.PhotoImage(resized_image)
+            card_label.config(image=card_label.image)
+
+
+def check_and_resize_cards(gsetup):
+    for column in gsetup.columns:
+        if len(column) > 8:
+            resize_all_cards(gsetup, width=60, height=90)  # Przykładowe wymiary mniejszych kart
+            return  # Zakończ, jeśli warunek został spełniony
+
+    # Przywróć domyślny rozmiar kart, jeśli w żadnej kolumnie liczba kart nie przekracza 10
+    resize_all_cards(gsetup, width=100, height=145)  # Przykładowe wymiary normalnych kart
 
 
 def on_stock_pile_click(gsetup, event):

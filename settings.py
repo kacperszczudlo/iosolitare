@@ -110,7 +110,7 @@ class Settings(tk.Toplevel):
     def change_background(self):
         backgrounds = [
             'default_background.jpg',
-            'alternative1_background.jpg',
+            'alternative_background.jpg',
             'alternative2_background.jpg',
             'alternative3_background.jpg'
         ]

@@ -35,8 +35,7 @@ def is_valid_move(gsetup, selected_card, target_column_index):
     target_card = target_column[-1]
 
     if target_card is None or selected_card is None:
-        #print(f"Invalid move: either target_card or selected_card is None (target_card: {target_card}, selected_card: {selected_card})")
-        return False  # Niepoprawny ruch, jeśli `target_card` lub `selected_card` jest `None`
+        return False
 
     # Skip if target_card is the same as selected_card
     if selected_card == target_card:
@@ -44,7 +43,15 @@ def is_valid_move(gsetup, selected_card, target_column_index):
     else:
         gsetup.bugfix_previous_card = target_card
 
-    #print(f"Selected card: {selected_card.figure}, Target card: {target_card.figure}")
+    # Ruch z foundation stack na stos dolny
+    if selected_card in [area['card'] for area in gsetup.upper_stack_areas]:
+        return (
+            target_card.points == selected_card.points + 1 and
+            ((target_card.color == "red" and selected_card.color == "black") or
+             (target_card.color == "black" and selected_card.color == "red"))
+        )
+
+    # Standardowy ruch między kolumnami
     return (selected_card.points == target_card.points - 1 and
             ((selected_card.color == "red" and target_card.color == "black") or
              (selected_card.color == "black" and target_card.color == "red")))

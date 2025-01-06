@@ -130,7 +130,7 @@ def on_card_release(gsetup, event):
         target_column = None
         valid_move = False
 
-        # Foundation
+        # Sprawdź ruch do foundation stack
         for area in gsetup.upper_stack_areas:
             if rectangles_overlap({'x': card_x, 'y': card_y, 'width': 100, 'height': 145}, area):
                 if is_valid_upper_stack_move(gsetup.selected_card, area):
@@ -177,35 +177,56 @@ def on_card_release(gsetup, event):
             gsetup.selected_card = None
             return
 
-        # Karta z foundation wyciągnięta i niepoprawnie położona
+        # Obsługa przenoszenia z foundation stack na stos dolny
         for area in gsetup.upper_stack_areas:
-            if gsetup.selected_card in area['stack']:
-                area['stack'].remove(gsetup.selected_card)
-                if len(area['stack']) > 0:
-                    area['card'] = area['stack'][-1]
-                else:
-                    area['card'] = None
+            if gsetup.selected_card == area['card']:
+                for col_index, column in enumerate(gsetup.columns):
+                    if is_valid_move(gsetup, gsetup.selected_card, col_index):
+                        gsetup.save_game_state()
 
-                if not valid_move:
-                    event.widget.place(x=area['x'], y=area['y'])
-                    print(f"Invalid move: {gsetup.selected_card.figure} from foundation stack ({area['suit']}).")
-                    gsetup.selected_card = None
-                    gsetup.moving_cards = []
-                    return
-                break
+                        # Usuwanie karty z foundation stack
+                        area['stack'].remove(gsetup.selected_card)
+                        if area['stack']:
+                            area['card'] = area['stack'][-1]
+                        else:
+                            area['card'] = None
 
-        # Docelowa kolumna
+                        # Dodanie karty do kolumny dolnej
+                        column.append(gsetup.selected_card)
+                        for i, card in enumerate(column):
+                            card_label = next(l for l in gsetup.card_labels if l.card_object == card)
+                            card_label.place(
+                                x=gsetup.lower_stack_areas[col_index]['x'],
+                                y=gsetup.lower_stack_areas[col_index]['y'] + i * 30
+                            )
+                            card_label.lift()
+
+                        gsetup.game_ui.update_score(10)
+                        print(f"Moved card {gsetup.selected_card.figure} to column {col_index + 1}")
+                        valid_move = True
+                        break
+
+                if valid_move:
+                    break
+
+        if valid_move:
+            gsetup.moving_cards = []
+            gsetup.game_ui.remove_highlight(event.widget)
+            gsetup.selected_card = None
+            return
+
+        # Docelowa kolumna w stosie dolnym
         for col_index, column in enumerate(gsetup.columns):
             if not column:
                 placeholder_area = gsetup.lower_stack_areas[col_index]
-                if rectangles_overlap({'x': card_x, 'y': card_y, 'width':100, 'height':145}, placeholder_area):
+                if rectangles_overlap({'x': card_x, 'y': card_y, 'width': 100, 'height': 145}, placeholder_area):
                     target_column = col_index
                     break
             else:
                 last_card = column[-1]
-                last_card_position = next((pos for pos in gsetup.card_positions if pos['card']==last_card), None)
+                last_card_position = next((pos for pos in gsetup.card_positions if pos['card'] == last_card), None)
                 if last_card_position and rectangles_overlap(
-                    {'x': card_x, 'y': card_y, 'width':100,'height':145}, last_card_position):
+                        {'x': card_x, 'y': card_y, 'width': 100, 'height': 145}, last_card_position):
                     target_column = col_index
                     break
 
@@ -229,7 +250,7 @@ def on_card_release(gsetup, event):
                     card_label.place(
                         x=gsetup.lower_stack_areas[target_column]['x'],
                         y=gsetup.lower_stack_areas[target_column]['y'] +
-                          (len(gsetup.columns[target_column]) - len(gsetup.moving_cards)) * 30 + i * 30
+                        (len(gsetup.columns[target_column]) - len(gsetup.moving_cards)) * 30 + i * 30
                     )
                     card_label.lift()
 
@@ -257,7 +278,7 @@ def on_card_release(gsetup, event):
                 if is_game_won(gsetup):
                     award_points_for_lower_columns(gsetup)
                     gsetup.game_ui.show_centered_box()
-                print(f"Placed card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit} in column {target_column+1}")
+                print(f"Placed card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit} in column {target_column + 1}")
                 print(f"Current state of columns: {[len(col) for col in gsetup.columns]}")
                 gsetup.game_ui.play_card_place_sound()
             else:
@@ -280,6 +301,7 @@ def on_card_release(gsetup, event):
         gsetup.selected_card = None
         gsetup.moving_cards = []
         gsetup.game_ui.remove_highlight(event.widget)
+
 
 
 def on_stock_pile_click(gsetup, event):

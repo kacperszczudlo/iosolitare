@@ -6,6 +6,9 @@ from settings import Settings
 from gameLogic import get_highscore
 from gameSetup import GameSetup
 from gameUI import GameUI
+from tkinter import Toplevel, Canvas
+from ffpyplayer.player import MediaPlayer
+import threading
 
 
 class PasjansApp:
@@ -48,6 +51,72 @@ class PasjansApp:
         pygame.mixer.music.set_volume(0.01)
         pygame.mixer.music.play(-1)
 
+    def show_tutorial(self):
+        # Ścieżka do pliku wideo
+        video_path = os.path.join(self.resources_dir, "tutorialek.mp4")
+
+        # Ustawienie stałej szerokości i wysokości okna
+        window_width = 1200
+        window_height = 800
+
+        # Tworzenie okna dla samouczka
+        tutorial_window = Toplevel(self.root)
+        tutorial_window.title("Samouczek")
+        tutorial_window.geometry(f"{window_width}x{window_height}")
+        tutorial_window.resizable(False, False)
+
+        # Wyśrodkowanie okna
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        x_offset = (screen_width - window_width) // 2
+        y_offset = (screen_height - window_height) // 2
+        tutorial_window.geometry(f"{window_width}x{window_height}+{x_offset}+{y_offset}")
+
+        # Ustawienie okna na najwyższy indeks
+        tutorial_window.attributes('-topmost', True)
+
+        # Canvas do wyświetlania wideo
+        canvas = Canvas(tutorial_window, width=window_width, height=window_height, bg="black")
+        canvas.pack()
+
+        # MediaPlayer dla wideo
+        player = MediaPlayer(video_path)
+
+        # Flaga do zatrzymania odtwarzania
+        playing = True
+
+        def play_video():
+            nonlocal playing
+            while playing:
+                try:
+                    frame, val = player.get_frame()
+                    if val == 'eof':  # Koniec wideo
+                        break
+                    if frame is not None and tutorial_window.winfo_exists():  # Sprawdzanie istnienia okna
+                        img, _ = frame
+                        img = Image.frombytes('RGB', img.get_size(), img.to_bytearray()[0])
+                        img = img.resize((window_width, window_height))  # Skalowanie obrazu
+                        imgtk = ImageTk.PhotoImage(image=img)
+                        canvas.create_image(0, 0, anchor="nw", image=imgtk)
+                        canvas.image = imgtk  # Zapobiega usuwaniu obrazu z pamięci
+                except Exception as e:
+                   
+                    break
+
+        def stop_playback():
+            nonlocal playing
+            playing = False
+            player.close_player()  # Zatrzymanie odtwarzania
+            tutorial_window.destroy()
+
+        # Uruchomienie wideo w osobnym wątku
+        video_thread = threading.Thread(target=play_video, daemon=True)
+        video_thread.start()
+
+        # Obsługa zamykania okna
+        tutorial_window.protocol("WM_DELETE_WINDOW", stop_playback)
+
+
     def stop_music(self):
         pygame.mixer.music.stop()
 
@@ -69,7 +138,7 @@ class PasjansApp:
         self.create_button(temp_game_ui, "Nowa gra", 130, menu_button_y - 100, button_width, self.start_game, button_font)
         self.create_button(temp_game_ui, "Najlepsze wyniki", 130, menu_button_y - 50, button_width, self.show_highscore, button_font)
         self.create_button(temp_game_ui, "Zasady Gry", 130, menu_button_y, button_width, self.show_game_rules, button_font)
-        self.create_button(temp_game_ui, "Samouczek", 130, menu_button_y + 50, button_width, None, button_font)
+        self.create_button(temp_game_ui, "Samouczek", 130, menu_button_y + 50, button_width, self.show_tutorial, button_font)
         self.create_button(temp_game_ui, "Ustawienia", 130, menu_button_y + 100, button_width, self.show_settings, button_font)
 
     def create_button(self, game_ui, text, x, y, width, command, font):

@@ -133,7 +133,8 @@ def on_card_release(gsetup, event):
         # Sprawdź ruch do foundation stack
         for area in gsetup.upper_stack_areas:
             if rectangles_overlap({'x': card_x, 'y': card_y, 'width': 100, 'height': 145}, area):
-                if is_valid_upper_stack_move(gsetup.selected_card, area):
+                # Zezwalaj na ruch tylko jednej karty na stos końcowy
+                if len(gsetup.moving_cards) == 1 and is_valid_upper_stack_move(gsetup.selected_card, area):
                     gsetup.save_game_state()
 
                     gsetup.move_counter += 1
@@ -168,7 +169,8 @@ def on_card_release(gsetup, event):
                     for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
                         stack_cards = [c.figure for c in stack_area['stack']]
                         print(f"Foundation stack {idx} ({stack_area['suit']}): {stack_cards}")
-
+                else:
+                    print("Invalid move: Only one card can be moved to the foundation stack at a time.")
                 break
 
         if valid_move:
@@ -301,6 +303,7 @@ def on_card_release(gsetup, event):
         gsetup.selected_card = None
         gsetup.moving_cards = []
         gsetup.game_ui.remove_highlight(event.widget)
+
 
 
 

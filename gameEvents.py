@@ -1,4 +1,5 @@
-from tkinter import Button
+import os
+from tkinter import Button, Label
 from functools import partial
 from gameLogic import *
 from PIL import Image, ImageTk
@@ -283,7 +284,6 @@ def on_card_release(gsetup, event):
                     gsetup.game_ui.show_centered_box()
                 print(f"Placed card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit} in column {target_column + 1}")
                 print(f"Current state of columns: {[len(col) for col in gsetup.columns]}")
-                check_and_resize_cards(gsetup)
                 gsetup.game_ui.play_card_place_sound()
             else:
                 print(f"Invalid move in on_card_release: selected_card: {gsetup.selected_card.figure}, target_column: {target_column}")
@@ -301,6 +301,7 @@ def on_card_release(gsetup, event):
 
             print(f"No valid target column for: {gsetup.selected_card.figure} of {gsetup.selected_card.suit}")
 
+        check_and_resize_cards(gsetup)
         update_card_position(gsetup, gsetup.selected_card, card_x, card_y)
         gsetup.selected_card = None
         gsetup.moving_cards = []
@@ -320,8 +321,7 @@ def resize_all_cards(gsetup, width, height):
             # Zaktualizuj obraz w widżecie
             card_label.image = ImageTk.PhotoImage(resized_image)
             card_label.config(image=card_label.image)
-
-        if hasattr(card, "back_image") and not card.revealed:
+        elif hasattr(card, "back_image") and not card.revealed:
             # Załaduj oryginalny obraz
             original_image = Image.open(card.back_image)
 
@@ -334,13 +334,31 @@ def resize_all_cards(gsetup, width, height):
 
 
 def check_and_resize_cards(gsetup):
+    # Zmień rozmiar placeholderów
+    placeholder_path = os.path.join(gsetup.resources_dir, 'placeholders', 'placeholder.png')
     for column in gsetup.columns:
         if len(column) > 8:
-            resize_all_cards(gsetup, width=60, height=90)  # Przykładowe wymiary mniejszych kart
+            resize_all_cards(gsetup, width=70, height=100)  # Przykładowe wymiary mniejszych kart
+
+            for widget in gsetup.window.winfo_children():
+                if isinstance(widget, Label) and hasattr(widget, "is_placeholder"):  # Rozpoznanie placeholdera
+                    original_image = Image.open(placeholder_path)
+                    resized_image = original_image.resize((70, 100), Image.Resampling.LANCZOS)
+                    resized_photo = ImageTk.PhotoImage(resized_image)
+                    widget.image = resized_photo
+                    widget.config(image=resized_photo)
             return  # Zakończ, jeśli warunek został spełniony
 
     # Przywróć domyślny rozmiar kart, jeśli w żadnej kolumnie liczba kart nie przekracza 10
     resize_all_cards(gsetup, width=100, height=145)  # Przykładowe wymiary normalnych kart
+
+    for widget in gsetup.window.winfo_children():
+        if isinstance(widget, Label) and hasattr(widget, "is_placeholder"):  # Rozpoznanie placeholdera
+            original_image = Image.open(placeholder_path)
+            resized_image = original_image.resize((100, 145), Image.Resampling.LANCZOS)
+            resized_photo = ImageTk.PhotoImage(resized_image)
+            widget.image = resized_photo
+            widget.config(image=resized_photo)
 
 
 def on_stock_pile_click(gsetup, event):
@@ -381,6 +399,8 @@ def on_stock_pile_click(gsetup, event):
                     bd=0
                 )
                 gsetup.restore_button.place(x=130, y=153, width=101, height=145)
+
+        check_and_resize_cards(gsetup)
 
         print(f"Drew card: {card.figure} of {card.suit}")
 

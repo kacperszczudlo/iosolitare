@@ -53,6 +53,7 @@ class GameUI:
         placeholder_label = Label(self.gameSetup.window, image=placeholder_photo, bd=0)
         placeholder_label.image = placeholder_photo
         placeholder_label.place(x=x, y=y)
+        placeholder_label.is_placeholder = True
 
     def create_card(self, x, y, card):
         card_image_path = os.path.join(self.gameSetup.cards_dir, os.path.basename(card.get_image()))

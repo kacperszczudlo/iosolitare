@@ -85,6 +85,15 @@ class GameSetup:
         self.game_ui.start_timer()
         self.game_ui.update_move_counter(self.move_counter)
 
+        placeholder_path = os.path.join(self.resources_dir, 'placeholders', 'placeholder.png')
+        for widget in self.window.winfo_children():
+            if isinstance(widget, Label) and hasattr(widget, "is_placeholder"):  # Rozpoznanie placeholdera
+                original_image = Image.open(placeholder_path)
+                resized_image = original_image.resize((100, 145), Image.Resampling.LANCZOS)
+                resized_photo = ImageTk.PhotoImage(resized_image)
+                widget.image = resized_photo
+                widget.config(image=resized_photo)
+
 
 
 

@@ -241,6 +241,7 @@ class GameSetup:
     def undo_move(self):
         if self.previous_state is not None:
             self.restore_game_state()
+            gameEvents.check_and_resize_cards(self)
             print("Cofnięto ostatni ruch.")
         else:
             print("Brak ruchu do cofnięcia.")

@@ -147,6 +147,7 @@ def on_card_release(gsetup, event):
                         source_column.remove(gsetup.selected_card)
                         if len(source_column) > 0:
                             gsetup.reveal_previous_card(source_column)
+                            check_and_resize_cards(gsetup)
                             gsetup.game_ui.update_score(5)
                         else:
                             col_index = gsetup.columns.index(source_column)
@@ -355,62 +356,44 @@ def check_and_resize_cards(gsetup):
         resize_all_cards(gsetup, width=70, height=100)  # Przykładowe wymiary mniejszych kart
 
         # Zmień rozmiar placeholderów w kolumnach
-        for widget in gsetup.window.winfo_children():
-            if isinstance(widget, Label) and hasattr(widget, "is_placeholder"):
-                original_image = Image.open(placeholder_path)
-                resized_image = original_image.resize((70, 100), Image.Resampling.LANCZOS)
-                resized_photo = ImageTk.PhotoImage(resized_image)
-                widget.image = resized_photo
-                widget.config(image=resized_photo)
+        placeholder_resize(gsetup, placeholder_path)
     else:
         # Przywróć normalny rozmiar kart w kolumnach
         resize_all_cards(gsetup, width=100, height=145)
 
         # Przywróć normalny rozmiar placeholderów w kolumnach
-        for widget in gsetup.window.winfo_children():
-            if isinstance(widget, Label) and hasattr(widget, "is_placeholder"):
-                original_image = Image.open(placeholder_path)
-                resized_image = original_image.resize((100, 145), Image.Resampling.LANCZOS)
-                resized_photo = ImageTk.PhotoImage(resized_image)
-                widget.image = resized_photo
-                widget.config(image=resized_photo)
+        placeholder_resize(gsetup, placeholder_path)
 
     # Przywróć oryginalny rozmiar kart na fundacjach
     for area in gsetup.upper_stack_areas:
         if area['card']:  # Jeśli jest karta na fundacji
-            card_label = next((label for label in gsetup.card_labels if label.card_object == area['card']), None)
-            if card_label:
-                original_width = 100
-                original_height = 145
-                card_image = Image.open(area['card'].front_image)
-                resized_image = card_image.resize((original_width, original_height), Image.Resampling.LANCZOS)
-                resized_photo = ImageTk.PhotoImage(resized_image)
-                card_label.image = resized_photo
-                card_label.config(image=resized_photo)
+            card_resize(gsetup, area['card'].front_image, area['card'])
 
     for card in gsetup.stock_waste:
-        card_label = next((label for label in gsetup.card_labels if label.card_object == card), None)
-        if card_label:
-            original_width = 100
-            original_height = 145
-            card_image = Image.open(card.front_image)
-            resized_image = card_image.resize((original_width, original_height), Image.Resampling.LANCZOS)
-            resized_photo = ImageTk.PhotoImage(resized_image)
-            card_label.image = resized_photo
-            card_label.config(image=resized_photo)
+        card_resize(gsetup, card.front_image, card)
 
     for card in gsetup.stock_pile:
-        card_label = next((label for label in gsetup.card_labels if label.card_object == card), None)
-        if card_label:
-            original_width = 100
-            original_height = 145
-            card_image = Image.open(card.back_image)
-            resized_image = card_image.resize((original_width, original_height), Image.Resampling.LANCZOS)
+        card_resize(gsetup, card.back_image, card)
+
+def placeholder_resize(gsetup, placeholder_path):
+    for widget in gsetup.window.winfo_children():
+        if isinstance(widget, Label) and hasattr(widget, "is_placeholder"):
+            original_image = Image.open(placeholder_path)
+            resized_image = original_image.resize((70, 100), Image.Resampling.LANCZOS)
             resized_photo = ImageTk.PhotoImage(resized_image)
-            card_label.image = resized_photo
-            card_label.config(image=resized_photo)
+            widget.image = resized_photo
+            widget.config(image=resized_photo)
 
-
+def card_resize(gsetup, image, card):
+    card_label = next((label for label in gsetup.card_labels if label.card_object == card), None)
+    if card_label:
+        original_width = 100
+        original_height = 145
+        card_image = Image.open(image)
+        resized_image = card_image.resize((original_width, original_height), Image.Resampling.LANCZOS)
+        resized_photo = ImageTk.PhotoImage(resized_image)
+        card_label.image = resized_photo
+        card_label.config(image=resized_photo)
 
 def on_stock_pile_click(gsetup, event):
     if gsetup.stock_pile:

@@ -356,13 +356,13 @@ def check_and_resize_cards(gsetup):
         resize_all_cards(gsetup, width=70, height=100)  # Przykładowe wymiary mniejszych kart
 
         # Zmień rozmiar placeholderów w kolumnach
-        placeholder_resize(gsetup, placeholder_path)
+        placeholder_resize(gsetup, placeholder_path, 70, 100)
     else:
         # Przywróć normalny rozmiar kart w kolumnach
         resize_all_cards(gsetup, width=100, height=145)
 
         # Przywróć normalny rozmiar placeholderów w kolumnach
-        placeholder_resize(gsetup, placeholder_path)
+        placeholder_resize(gsetup, placeholder_path, 100, 145)
 
     # Przywróć oryginalny rozmiar kart na fundacjach
     for area in gsetup.upper_stack_areas:
@@ -375,11 +375,11 @@ def check_and_resize_cards(gsetup):
     for card in gsetup.stock_pile:
         card_resize(gsetup, card.back_image, card)
 
-def placeholder_resize(gsetup, placeholder_path):
+def placeholder_resize(gsetup, placeholder_path, width, height):
     for widget in gsetup.window.winfo_children():
         if isinstance(widget, Label) and hasattr(widget, "is_placeholder"):
             original_image = Image.open(placeholder_path)
-            resized_image = original_image.resize((70, 100), Image.Resampling.LANCZOS)
+            resized_image = original_image.resize((width, height), Image.Resampling.LANCZOS)
             resized_photo = ImageTk.PhotoImage(resized_image)
             widget.image = resized_photo
             widget.config(image=resized_photo)

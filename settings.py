@@ -68,7 +68,7 @@ class Settings(tk.Toplevel):
             self.app.current_victory_sound = 'resources/soundtracks/default/default.mp3'
             self.app.current_background_sound = 'resources/soundtracks/default/cas_music.mp3'
         elif soundtrack_name == 'alternative':
-            self.app.current_card_place_sound = 'resources/soundtracks/alternative/augh.mp3'
+            self.app.current_card_place_sound = 'resources/soundtracks/alternative/can_opening.mp3'
             self.app.current_victory_sound = 'resources/soundtracks/alternative/palermo.mp3'
             self.app.current_background_sound = 'resources/soundtracks/alternative/temperatura.mp3'
 

@@ -17,6 +17,7 @@ class GameUI:
         self.pause = False
         self.root = root
         self.added = False
+        self.won = False
         pygame.mixer.init()
 
     def play_music(self, file_path):
@@ -108,7 +109,8 @@ class GameUI:
         if self.elapsed_time % 15 == 0 and not self.pause:
             self.pause = True
             self.update_score(-2)
-        self.gameSetup.window.after(1000, self.update_timer)
+        if not self.won:
+            self.gameSetup.window.after(1000, self.update_timer)
 
     def update_move_counter(self, count):
         self.move_counter_label = Label(self.gameSetup.window, text=f"Ruchy: {count}", font=("Arial", 12, "bold"), fg="white", bg="#5C4033")

@@ -212,7 +212,7 @@ class PasjansApp:
         user_interface.create_label("Punkty: 0", 711, 16, 119)
         user_interface.create_label("Ruchy: 0", 846, 16, 119)
         user_interface.create_label("Czas: 00:00", 981, 16, 119)
-        user_interface.create_button("Najlepsze wyniki", 16, 753, 200)
+        user_interface.create_button("Najlepsze wyniki", 16, 753, 200, self.show_highscore)
 
         for x, y in [(130, 153), (270, 153), (130, 378), (270, 378), (410, 378), (550, 378), (690, 378), (830, 378), (970, 378)]:
             user_interface.create_placeholder(x, y)

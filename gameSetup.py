@@ -79,6 +79,7 @@ class GameSetup:
         self.game_ui = GameUI(self)
         self.game_ui.display_initial_deal(columns)
         self.game_ui.display_stock_pile()
+        self.game_ui.won = False
 
         self.update_lower_stack_areas()
         self.game_ui.init_score()

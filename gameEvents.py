@@ -5,6 +5,7 @@ def on_card_click(gsetup, event):
     if is_game_won(gsetup):
         award_points_for_lower_columns(gsetup)
         gsetup.game_ui.show_centered_box()
+        gsetup.game_ui.won = True
     card = event.widget.card_object
     if not card.revealed:
         return
@@ -161,6 +162,7 @@ def on_card_release(gsetup, event):
                     if is_game_won(gsetup):
                         award_points_for_lower_columns(gsetup)
                         gsetup.game_ui.show_centered_box()
+                        gsetup.game_ui.won = True
                     print(f"Moved card {gsetup.selected_card.figure} to foundation stack ({area['suit']}).")
                     valid_move = True
                     gsetup.game_ui.update_score(10)
@@ -280,6 +282,7 @@ def on_card_release(gsetup, event):
                 if is_game_won(gsetup):
                     award_points_for_lower_columns(gsetup)
                     gsetup.game_ui.show_centered_box()
+                    gsetup.game_ui.won = True
                 print(f"Placed card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit} in column {target_column + 1}")
                 print(f"Current state of columns: {[len(col) for col in gsetup.columns]}")
                 gsetup.game_ui.play_card_place_sound()

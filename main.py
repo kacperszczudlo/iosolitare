@@ -141,6 +141,29 @@ class PasjansApp:
         self.create_button(temp_game_ui, "Samouczek", 130, menu_button_y + 50, button_width, self.show_tutorial, button_font)
         self.create_button(temp_game_ui, "Ustawienia", 130, menu_button_y + 100, button_width, self.show_settings, button_font)
 
+    def return_to_menu(self):
+        if self.current_frame:
+            self.current_frame.destroy()
+        self.current_frame = Frame(self.root)
+        self.current_frame.pack(fill="both", expand=True)
+
+        background_label = Label(self.current_frame, image=self.menu_background_image)
+        background_label.place(x=0, y=0, relwidth=1, relheight=1)
+        corona_label = Label(self.current_frame, image=self.corona_image)
+        corona_label.place(x=500, y=300)
+
+        temp_game_ui = GameUI(GameSetup(self.root, self.resources_dir, self.cards_dir, app=self), self.root)
+        button_width = 200
+        menu_button_y = 400
+        button_font = ("Arial", 12, "bold")
+        self.create_button(temp_game_ui, "Nowa gra", 130, menu_button_y - 100, button_width, self.start_game, button_font)
+        self.create_button(temp_game_ui, "Najlepsze wyniki", 130, menu_button_y - 50, button_width, self.show_highscore, button_font)
+        self.create_button(temp_game_ui, "Zasady Gry", 130, menu_button_y, button_width, self.show_game_rules, button_font)
+        self.create_button(temp_game_ui, "Samouczek", 130, menu_button_y + 50, button_width, self.show_tutorial, button_font)
+        self.create_button(temp_game_ui, "Ustawienia", 130, menu_button_y + 100, button_width, self.show_settings, button_font)
+        self.stop_music()
+
+
     def create_button(self, game_ui, text, x, y, width, command, font):
         button = Button(self.current_frame, text=text, font=font, fg="white", bd=0, highlightthickness=0, bg="#5C4033", activebackground="#3C2E23", state="normal", command=command)
         button.place(x=x, y=y, width=width, height=40)
@@ -222,6 +245,7 @@ class PasjansApp:
         user_interface.create_label("Czas: 00:00", 981, 16, 119)
         user_interface.create_button("Najlepsze wyniki", 16, 753, 200, self.show_highscore)
         user_interface.create_button("Wycisz/Odcisz dzwiek", 975, 753, 200, self.music_button_change)
+        user_interface.create_button("⭠", 50, 16, 50, self.return_to_menu)
 
         for x, y in [(130, 153), (270, 153), (130, 378), (270, 378), (410, 378), (550, 378), (690, 378), (830, 378), (970, 378)]:
             user_interface.create_placeholder(x, y)

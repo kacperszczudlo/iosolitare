@@ -20,7 +20,7 @@ class PasjansApp:
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         self.resources_dir = os.path.join(self.script_dir, 'resources')
         self.cards_dir = os.path.join(self.resources_dir, 'cards', 'default')
-
+        self.playing_background_music = True
         self.current_theme = "default"
         self.current_gif = 'resources/win/default/fireworks.jpg'
         self.current_background_sound = 'resources/soundtracks/default/cas_music.mp3'
@@ -183,6 +183,14 @@ class PasjansApp:
         settings = Settings(self.root, self)
         settings.grab_set()
 
+    def music_button_change(self):
+        if self.playing_background_music:
+            self.stop_music()
+            self.playing_background_music = False
+        else:
+            self.play_background_music()
+            self.playing_background_music = True
+
     def start_game(self):
         if self.current_frame:
             self.current_frame.destroy()
@@ -213,6 +221,7 @@ class PasjansApp:
         user_interface.create_label("Ruchy: 0", 846, 16, 119)
         user_interface.create_label("Czas: 00:00", 981, 16, 119)
         user_interface.create_button("Najlepsze wyniki", 16, 753, 200, self.show_highscore)
+        user_interface.create_button("Wycisz/Odcisz dzwiek", 975, 753, 200, self.music_button_change)
 
         for x, y in [(130, 153), (270, 153), (130, 378), (270, 378), (410, 378), (550, 378), (690, 378), (830, 378), (970, 378)]:
             user_interface.create_placeholder(x, y)

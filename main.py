@@ -207,12 +207,16 @@ class PasjansApp:
         settings.grab_set()
 
     def music_button_change(self):
+        game_setup = GameSetup(self.root, self.resources_dir, self.cards_dir, app=self)
+        user_interface = GameUI(game_setup, self.root)
         if self.playing_background_music:
             self.stop_music()
             self.playing_background_music = False
+            user_interface.create_button("Odcisz dźwięk", 975, 753, 200, self.music_button_change)
         else:
             self.play_background_music()
             self.playing_background_music = True
+            user_interface.create_button("Wycisz dźwięk", 975, 753, 200, self.music_button_change)
 
     def start_game(self):
         if self.current_frame:
@@ -244,7 +248,7 @@ class PasjansApp:
         user_interface.create_label("Ruchy: 0", 846, 16, 119)
         user_interface.create_label("Czas: 00:00", 981, 16, 119)
         user_interface.create_button("Najlepsze wyniki", 16, 753, 200, self.show_highscore)
-        user_interface.create_button("Wycisz/Odcisz dzwiek", 975, 753, 200, self.music_button_change)
+        user_interface.create_button("Wycisz dźwięk", 975, 753, 200, self.music_button_change)
         user_interface.create_button("⭠", 50, 16, 50, self.return_to_menu)
 
         for x, y in [(130, 153), (270, 153), (130, 378), (270, 378), (410, 378), (550, 378), (690, 378), (830, 378), (970, 378)]:

@@ -19,6 +19,7 @@ class Card:
     def hide(self):
         # Ustawia kartę jako zakrytą (tyłem do góry).
         self.revealed = False
+        # print(f"schowano karte {self.figure}-{self.suit}")
 
     def get_image(self):
         # Zwraca odpowiedni obraz w zależności od tego, czy karta jest odkryta czy zakryta.
@@ -27,3 +28,6 @@ class Card:
     def __repr__(self):
         # Zwraca reprezentację tekstową karty z jej figurą, punktami i statusem odkrycia.
         return f"{self.figure} (Punkty: {self.points}, Odkryta: {self.revealed})"
+
+    # def __del__(self):
+        # print(f"Usunięto karte {self.points} , {self.figure}")

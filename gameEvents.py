@@ -146,7 +146,9 @@ def on_card_release(gsetup, event):
                         source_column.remove(gsetup.selected_card)
                         if len(source_column) > 0:
                             gsetup.reveal_previous_card(source_column)
-                            gsetup.game_ui.update_score(5)
+                            if not gsetup.selected_card.moved:
+                                gsetup.game_ui.update_score(5)
+                                gsetup.selected_card.moved = True
                         else:
                             col_index = gsetup.columns.index(source_column)
                             print(f"Column {col_index + 1} is now empty.")
@@ -165,7 +167,9 @@ def on_card_release(gsetup, event):
                         gsetup.game_ui.won = True
                     print(f"Moved card {gsetup.selected_card.figure} to foundation stack ({area['suit']}).")
                     valid_move = True
-                    gsetup.game_ui.update_score(10)
+                    if not gsetup.selected_card.moved:
+                        gsetup.game_ui.update_score(10)
+                        gsetup.selected_card.moved = True
                     gsetup.game_ui.play_card_place_sound()
                     print("Current state of all foundation stacks:")
                     for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
@@ -205,7 +209,9 @@ def on_card_release(gsetup, event):
                             )
                             card_label.lift()
 
-                        gsetup.game_ui.update_score(10)
+                        if not gsetup.selected_card.moved:
+                            gsetup.game_ui.update_score(10)
+                            gsetup.selected_card.moved = True
                         print(f"Moved card {gsetup.selected_card.figure} to column {col_index + 1}")
                         valid_move = True
                         break
@@ -260,7 +266,9 @@ def on_card_release(gsetup, event):
 
                 if source_column and len(source_column) > 0:
                     gsetup.reveal_previous_card(source_column)
-                    gsetup.game_ui.update_score(5)
+                    if not gsetup.selected_card.moved:
+                        gsetup.game_ui.update_score(5)
+                        gsetup.selected_card.moved = True
 
                 for card in gsetup.moving_cards:
                     c_label = next(l for l in gsetup.card_labels if l.card_object == card)
@@ -274,9 +282,7 @@ def on_card_release(gsetup, event):
                 if gsetup.selected_card.foundation:
                     gsetup.game_ui.update_score(-15)
                 else:
-                    if gsetup.selected_card.moved:
-                        gsetup.game_ui.update_score(-1)
-                    else:
+                    if not gsetup.selected_card.moved:
                         gsetup.game_ui.update_score(5)
                         gsetup.selected_card.moved = True
                 if is_game_won(gsetup):

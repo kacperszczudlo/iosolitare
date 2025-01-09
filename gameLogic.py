@@ -29,8 +29,9 @@ def rectangles_overlap(rect1, rect2):
 def is_valid_move(gsetup, selected_card, target_column_index):
     target_column = gsetup.columns[target_column_index]
 
-    if not target_column:  # Target column is empty
-        return selected_card.figure.lower().startswith("king")
+        # Jeśli kolumna jest pusta, sprawdź czy to król
+    if not target_column:
+        return selected_card.points == 13  # Król ma 13 punktów
 
     target_card = target_column[-1]
 

@@ -100,7 +100,7 @@ def on_card_drag(gsetup, event):
                             overlap_detected = True
                             break
                     except AttributeError as e:
-                        print(f"AttributeError in on_card_drag: {e}")
+                        #print(f"AttributeError in on_card_drag: {e}")
                         continue
 
         for area in gsetup.upper_stack_areas:
@@ -167,7 +167,7 @@ def on_card_release(gsetup, event):
                         award_points_for_lower_columns(gsetup)
                         gsetup.game_ui.show_centered_box()
                         gsetup.game_ui.won = True
-                    print(f"Moved card {gsetup.selected_card.figure} to foundation stack ({area['suit']}).")
+                    #print(f"Moved card {gsetup.selected_card.figure} to foundation stack ({area['suit']}).")
                     valid_move = True
                     if not gsetup.selected_card.moved:
                         gsetup.game_ui.update_score(10)
@@ -175,12 +175,13 @@ def on_card_release(gsetup, event):
                     else:
                         gsetup.game_ui.update_score(-1)
                     gsetup.game_ui.play_card_place_sound()
-                    print("Current state of all foundation stacks:")
+                    #print("Current state of all foundation stacks:")
                     for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
                         stack_cards = [c.figure for c in stack_area['stack']]
-                        print(f"Foundation stack {idx} ({stack_area['suit']}): {stack_cards}")
+                        #print(f"Foundation stack {idx} ({stack_area['suit']}): {stack_cards}")
                 else:
-                    print("Invalid move: Only one card can be moved to the foundation stack at a time.")
+                    pass
+                    #print("Invalid move: Only one card can be moved to the foundation stack at a time.")
                 break
 
         if valid_move:
@@ -218,7 +219,7 @@ def on_card_release(gsetup, event):
                             gsetup.selected_card.moved = True
                         else:
                             gsetup.game_ui.update_score(-1)
-                        print(f"Moved card {gsetup.selected_card.figure} to column {col_index + 1}")
+                        #print(f"Moved card {gsetup.selected_card.figure} to column {col_index + 1}")
                         valid_move = True
                         break
 
@@ -299,24 +300,24 @@ def on_card_release(gsetup, event):
                     award_points_for_lower_columns(gsetup)
                     gsetup.game_ui.show_centered_box()
                     gsetup.game_ui.won = True
-                print(f"Placed card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit} in column {target_column + 1}")
-                print(f"Current state of columns: {[len(col) for col in gsetup.columns]}")
+                #print(f"Placed card: {gsetup.selected_card.figure} of {gsetup.selected_card.suit} in column {target_column + 1}")
+                #print(f"Current state of columns: {[len(col) for col in gsetup.columns]}")
                 gsetup.game_ui.play_card_place_sound()
             else:
-                print(f"Invalid move in on_card_release: selected_card: {gsetup.selected_card.figure}, target_column: {target_column}")
+                #print(f"Invalid move in on_card_release: selected_card: {gsetup.selected_card.figure}, target_column: {target_column}")
                 for i, card in enumerate(gsetup.moving_cards):
                     c_label = next(l for l in gsetup.card_labels if l.card_object == card)
                     c_label.place(x=gsetup.original_x, y=gsetup.original_y + i * 30)
                     gsetup.game_ui.remove_highlight(c_label)
 
-                print(f"Invalid move: {gsetup.selected_card.figure} of {gsetup.selected_card.suit}")
+                #print(f"Invalid move: {gsetup.selected_card.figure} of {gsetup.selected_card.suit}")
         else:
             for i, card in enumerate(gsetup.moving_cards):
                 c_label = next(l for l in gsetup.card_labels if l.card_object == card)
                 c_label.place(x=gsetup.original_x, y=gsetup.original_y + i * 30)
                 gsetup.game_ui.remove_highlight(c_label)
 
-            print(f"No valid target column for: {gsetup.selected_card.figure} of {gsetup.selected_card.suit}")
+            #print(f"No valid target column for: {gsetup.selected_card.figure} of {gsetup.selected_card.suit}")
 
         update_card_position(gsetup, gsetup.selected_card, card_x, card_y)
         gsetup.selected_card = None
@@ -365,96 +366,10 @@ def on_stock_pile_click(gsetup, event):
                 )
                 gsetup.restore_button.place(x=130, y=153, width=101, height=145)
 
-        print(f"Drew card: {card.figure} of {card.suit}")
+        #print(f"Drew card: {card.figure} of {card.suit}")
 
     elif gsetup.stock_waste:
         recycle_stock_waste(gsetup)
-
-#
-# def on_card_double_click(gsetup, event):
-#     card = event.widget.card_object
-#     if not card.revealed:
-#         return
-#
-#     card_suit = card.figure.split(' ')[-1]
-#
-#     for i, area in enumerate(gsetup.upper_stack_areas):
-#         if area['suit'] == card_suit:
-#             # As na pusty foundation
-#             if not area['stack'] and card.points == 1:
-#                 # Ruch poprawny
-#                 gsetup.save_game_state()
-#
-#                 gsetup.move_counter += 1
-#                 gsetup.game_ui.update_move_counter(gsetup.move_counter)
-#
-#                 area['stack'].append(card)
-#                 area['card'] = card
-#                 event.widget.place(x=area['x'], y=area['y'])
-#                 event.widget.lift()
-#
-#                 source_column = next((column for column in gsetup.columns if card in column), None)
-#                 if source_column:
-#                     source_column.remove(card)
-#                     if len(source_column) > 0:
-#                         gsetup.reveal_previous_card(source_column)
-#                         gsetup.game_ui.update_score(5)
-#                     else:
-#                         col_index = gsetup.columns.index(source_column)
-#                         print(f"Column {col_index + 1} is now empty.")
-#                 elif card in gsetup.stock_waste:
-#                     gsetup.stock_waste.remove(gsetup.selected_card)
-#                     gsetup.wyjebane.append(gsetup.selected_card)
-#
-#                 gsetup.game_ui.update_score(10)
-#                 card.foundation = True
-#                 if is_game_won(gsetup):
-#                     gsetup.game_ui.show_centered_box()
-#                 print(f"Moved card {card.figure} to foundation stack ({area['suit']}).")
-#
-#                 print("Current state of all foundation stacks:")
-#                 for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
-#                     stack_cards = [c.figure for c in stack_area['stack']]
-#                     print(f"Foundation stack {idx} ({stack_area['suit']}): {stack_cards}")
-#                 return
-#
-#             # Kolejna karta na foundation
-#             elif area['stack'] and area['card'].points == card.points - 1:
-#                 gsetup.save_game_state()
-#
-#                 gsetup.move_counter += 1
-#                 gsetup.game_ui.update_move_counter(gsetup.move_counter)
-#
-#                 area['stack'].append(card)
-#                 area['card'] = card
-#                 event.widget.place(x=area['x'], y=area['y'])
-#                 event.widget.lift()
-#
-#                 source_column = next((column for column in gsetup.columns if card in column), None)
-#                 if source_column:
-#                     source_column.remove(card)
-#                     if len(source_column) > 0:
-#                         gsetup.reveal_previous_card(source_column)
-#                         gsetup.game_ui.update_score(5)
-#                     else:
-#                         col_index = gsetup.columns.index(source_column)
-#                         print(f"Column {col_index + 1} is now empty.")
-#                 elif card in gsetup.stock_waste:
-#                     gsetup.stock_waste.remove(gsetup.selected_card)
-#                     gsetup.wyjebane.append(gsetup.selected_card)
-#                 gsetup.game_ui.update_score(10)
-#                 if is_game_won(gsetup):
-#                     gsetup.game_ui.show_centered_box()
-#                 print(f"Moved card {card.figure} to foundation stack ({area['suit']}).")
-#
-#                 print("Current state of all foundation stacks:")
-#                 for idx, stack_area in enumerate(gsetup.upper_stack_areas, start=1):
-#                     stack_cards = [c.figure for c in stack_area['stack']]
-#                     print(f"Foundation stack {idx} ({stack_area['suit']}): {stack_cards}")
-#                 return
-#
-#     # Ruch niepoprawny - nie zapisujemy stanu
-#     print(f"Cannot move card {card.figure} to any foundation stack.")
 
 def award_points_for_lower_columns(gsetup):
     total_cards = sum(len(column) for column in gsetup.columns)

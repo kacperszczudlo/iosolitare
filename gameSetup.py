@@ -44,7 +44,7 @@ class GameSetup:
         ]
 
     def reset_game(self):
-        print("zresetowano gre")
+        #print("zresetowano gre")
         for label in self.card_labels:
             label.place_forget()
         self.card_labels.clear()
@@ -124,21 +124,22 @@ class GameSetup:
         current_state = self.get_current_state()
 
         if self.previous_state is None or self.previous_state.get('state') != current_state:
-            print("Zapisuję nowy stan gry...")
+            #print("Zapisuję nowy stan gry...")
             self.previous_state = {
                 'state': current_state,
                 'points_added': points_added,  # Punkty dodane w ruchu
                 'current_score': self.game_ui.score  # Aktualny wynik
             }
         else:
-            print("Stan gry nie zmienił się. Pomijam zapis.")
+            pass
+            #("Stan gry nie zmienił się. Pomijam zapis.")
 
 
 
 
     def restore_game_state(self):
         if self.previous_state is not None:
-            print("Przywracam stan gry z restore_game_state...")
+            #print("Przywracam stan gry z restore_game_state...")
 
             # Przywrócenie stanu gry
             self.columns = copy.deepcopy(self.previous_state['state']['columns'])
@@ -154,7 +155,7 @@ class GameSetup:
             # Przywrócenie wyniku
             restored_score = self.previous_state.get('current_score', self.game_ui.score)
             self.game_ui.update_score(restored_score - self.game_ui.score)
-            print(f"Przywrócono wynik: {restored_score}")
+            #print(f"Przywrócono wynik: {restored_score}")
 
             # Odświeżenie UI
             self.refresh_ui_after_restore()
@@ -162,7 +163,8 @@ class GameSetup:
             # Wyczyszczenie poprzedniego stanu
             self.previous_state = None
         else:
-            print("Brak stanu do przywrócenia.")
+            #print("Brak stanu do przywrócenia.")
+            pass
 
 
 
@@ -238,11 +240,12 @@ class GameSetup:
 
     def undo_move(self):
         if self.previous_state is not None:
-            print("Przywracam stan gry z undo_move...")
+            #print("Przywracam stan gry z undo_move...")
             self.restore_game_state()
-            print("Cofnięto ostatni ruch.")
+            #print("Cofnięto ostatni ruch.")
         else:
-            print("Brak ruchu do cofnięcia.")
+            #print("Brak ruchu do cofnięcia.")
+            pass
 
     def get_current_state(self):
         return {

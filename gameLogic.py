@@ -62,10 +62,10 @@ def is_valid_move(gsetup, selected_card, target_column_index):
 def recycle_stock_waste(gsetup):
     # Przenoszenie kart z powrotem do stosu dobieralnego
     if gsetup.stock_waste:
-        print("TEST BUGA 2 ", gsetup.stock_waste)
+        #print("TEST BUGA 2 ", gsetup.stock_waste)
         while gsetup.stock_waste:
             card = gsetup.stock_waste.pop()
-            print(f"card popped {card}")
+            #print(f"card popped {card}")
             if any(card in area['stack'] for area in gsetup.upper_stack_areas):
                 continue
             card.hide()  # Zakrywanie kart
@@ -86,7 +86,7 @@ def recycle_stock_waste(gsetup):
         # Odświeżenie stosu kart
         gsetup.game_ui.display_stock_pile(gsetup.wyjebane)
         gsetup.game_ui.update_score(-50)
-        print("Recycled stock waste back to stock pile.")
+        #print("Recycled stock waste back to stock pile.")
 
 def place_in_column(gsetup, x, y):
     # TODO: Umieszcza kartę w odpowiedniej kolumnie po wykonaniu ruchu.
@@ -97,19 +97,20 @@ def remove_card_from_column(gsetup, card):
     for col_index, column in enumerate(gsetup.columns):
         if card in column:
             column.remove(card)  # Usuń kartę z kolumny
-            print(f"Karta {card.figure} usunięta z kolumny {col_index + 1}")
+            #print(f"Karta {card.figure} usunięta z kolumny {col_index + 1}")
             break
     else:
-        print(f"Karta {card.figure} nie została znaleziona w żadnej kolumnie.")
+        pass
+        #print(f"Karta {card.figure} nie została znaleziona w żadnej kolumnie.")
 
     # Usuń kartę z logiki pozycji
     gsetup.card_positions = [
         pos for pos in gsetup.card_positions if pos['card'] != card
     ]
-    print(f"Pozycja karty {card.figure} usunięta z logiki pozycji.")
+    #print(f"Pozycja karty {card.figure} usunięta z logiki pozycji.")
 
     # Debugowanie - wyświetlenie aktualnego stanu kolumn
-    print(f"Aktualny stan kolumn: {[len(col) for col in gsetup.columns]}")
+    #print(f"Aktualny stan kolumn: {[len(col) for col in gsetup.columns]}")
 
 
 
@@ -117,7 +118,7 @@ def remove_card_from_positions(gsetup, card):
     gsetup.card_positions = [
         pos for pos in gsetup.card_positions if pos['card'] != card
     ]
-    print(f"Pozycja karty {card.figure} usunięta z logiki pozycji.")
+    #print(f"Pozycja karty {card.figure} usunięta z logiki pozycji.")
 
 def is_valid_upper_stack_move(card, area):
     # Sprawdza, czy karta pasuje do koloru i kolejności
@@ -129,8 +130,8 @@ def is_valid_upper_stack_move(card, area):
 
 
 def is_game_won(gsetup):
-    print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))
-    print("END GAME DEBUG Ilosc kart w stock_waste: ", len(gsetup.stock_waste))
+    #print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))
+    #print("END GAME DEBUG Ilosc kart w stock_waste: ", len(gsetup.stock_waste))
     lista = []
     for col in gsetup.columns:
         smalllist = []
@@ -144,19 +145,19 @@ def is_game_won(gsetup):
                     smalllist.append(False)
         lista.append(smalllist)
 
-    print("END GAME DEBUG lista", lista)
-    print("END GAME DEBUG Check", list(map(lambda x: isinstance(x, type(None)) or all(x), lista)))
-    if len(gsetup.stock_pile) == 0 and len(gsetup.stock_waste) == 0 and all(
-            map(lambda x: isinstance(x, type(None)) or all(x), lista)):
-        print("END GAME DEBUG WYGRANA !!!")
+    #print("END GAME DEBUG lista", lista)
+    #print("END GAME DEBUG Check", list(map(lambda x: isinstance(x, type(None)) or all(x), lista)))
+    # if len(gsetup.stock_pile) == 0 and len(gsetup.stock_waste) == 0 and all(
+    #         map(lambda x: isinstance(x, type(None)) or all(x), lista)):
+    #     print("WYGRANA !!!")
 
 
 def is_game_won(gsetup):
     #IF DO TESTOW
     # if gsetup.game_ui.score >= 15:
     #     return True
-    print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))
-    print("END GAME DEBUG Ilosc kart w stock_waste: ", len(gsetup.stock_waste))
+    #print("END GAME DEBUG Ilosc kart w stock_pile: ", len(gsetup.stock_pile))
+    #print("END GAME DEBUG Ilosc kart w stock_waste: ", len(gsetup.stock_waste))
     lista = []
     for col in gsetup.columns:
         smalllist = []
@@ -185,7 +186,7 @@ def is_game_won(gsetup):
 def get_highscore():
     import psycopg2
     try:
-        print("Start connecting...")
+        #("Start connecting...")
         connection = psycopg2.connect(
             host="195.150.230.208",
             port="5432",
@@ -193,7 +194,7 @@ def get_highscore():
             password="pedofil",
             database="2024_jop_kamil"
         )
-        print("Connected successfully!")
+        #print("Connected successfully!")
 
         cursor = connection.cursor()
         cursor.execute('''
@@ -203,18 +204,19 @@ def get_highscore():
         results = cursor.fetchall()
 
         connection.close()
-        print("Connection closed.")
-        print(results)
+        #print("Connection closed.")
+        #print(results)
         return results
 
     except psycopg2.Error as e:
-        print("Database error:", e)
+        pass
+        #print("Database error:", e)
 
 
 def add_highscore(nick, points):
     import psycopg2
     try:
-        print("Connecting to the database...")
+        #print("Connecting to the database...")
         connection = psycopg2.connect(
             host="195.150.230.208",
             port="5432",
@@ -222,7 +224,7 @@ def add_highscore(nick, points):
             password="pedofil",
             database="2024_jop_kamil"
         )
-        print("Connected successfully!")
+        #print("Connected successfully!")
 
         cursor = connection.cursor()
         # Use parameterized query to prevent SQL injection
@@ -231,12 +233,13 @@ def add_highscore(nick, points):
 
         # Commit the transaction
         connection.commit()
-        print("Highscore added successfully!")
+        #print("Highscore added successfully!")
 
     except psycopg2.Error as e:
-        print("Database error:", e)
+        pass
+        #print("Database error:", e)
     finally:
         if connection:
             cursor.close()
             connection.close()
-            print("Connection closed.")
+            #print("Connection closed.")

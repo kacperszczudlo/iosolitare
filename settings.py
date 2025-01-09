@@ -74,8 +74,8 @@ class Settings(tk.Toplevel):
 
         self.app.current_gif = gif
 
-        print(f"Soundtrack changed to: {soundtrack_name}")
-        print(f"GIF changed to: {self.app.current_gif}")
+        #print(f"Soundtrack changed to: {soundtrack_name}")
+        #print(f"GIF changed to: {self.app.current_gif}")
 
         self.soundtrack_preview.config(text=soundtrack_name)
         self.update_previews()
@@ -104,7 +104,7 @@ class Settings(tk.Toplevel):
             self.app.cards_dir = os.path.join(self.app.resources_dir, 'cards', 'alternative')
             self.app.current_theme = "alternative"
 
-        print(f"Motyw zmieniony na: {self.app.current_theme}")
+        #print(f"Motyw zmieniony na: {self.app.current_theme}")
         self.update_previews()
 
     def change_background(self):
@@ -121,7 +121,7 @@ class Settings(tk.Toplevel):
         self.app.game_background_path = os.path.join(self.app.resources_dir, 'background', backgrounds[next_index])
 
         self.app.game_background_image = self.load_image(self.app.game_background_path, (1200, 800))
-        print(f"Tło zmienione na: {self.app.game_background_path}")
+        #print(f"Tło zmienione na: {self.app.game_background_path}")
         self.update_previews()
         self.prepare_foundation_images()
 
@@ -129,7 +129,7 @@ class Settings(tk.Toplevel):
         try:
             return ImageTk.PhotoImage(Image.open(image_path).resize(size))
         except Exception as e:
-            print(f"Error loading image from {image_path}: {e}")
+            #print(f"Error loading image from {image_path}: {e}")
             return None
 
     def prepare_foundation_images(self):

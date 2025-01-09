@@ -147,7 +147,7 @@ def on_card_release(gsetup, event):
                         if len(source_column) > 0:
                             gsetup.reveal_previous_card(source_column)
                             if not gsetup.selected_card.moved:
-                                gsetup.game_ui.update_score(5)
+                                gsetup.game_ui.update_score(16)
                                 gsetup.selected_card.moved = True
                             else:
                                 gsetup.game_ui.update_score(-1)
@@ -273,7 +273,7 @@ def on_card_release(gsetup, event):
                 if source_column and len(source_column) > 0:
                     gsetup.reveal_previous_card(source_column)
                     if not gsetup.selected_card.moved:
-                        gsetup.game_ui.update_score(5)
+                        gsetup.game_ui.update_score(6)
                         gsetup.selected_card.moved = True
                     else:
                         gsetup.game_ui.update_score(-1)
@@ -291,7 +291,7 @@ def on_card_release(gsetup, event):
                     gsetup.game_ui.update_score(-15)
                 else:
                     if not gsetup.selected_card.moved:
-                        gsetup.game_ui.update_score(5)
+                        gsetup.game_ui.update_score(6)
                         gsetup.selected_card.moved = True
                     else:
                         gsetup.game_ui.update_score(-1)

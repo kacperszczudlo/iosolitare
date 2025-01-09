@@ -17,6 +17,7 @@ class GameUI:
         self.pause = False
         self.root = root
         self.added = False
+        self.score_label = None
         self.won = False
         pygame.mixer.init()
 
@@ -122,6 +123,10 @@ class GameUI:
         self.score_label.place(x=711, y=16, width=119, height=31)
 
     def update_score(self, score):
+        if self.score_label is None:
+            self.score_label = Label(self.gameSetup.window, text=f"Punkty: {self.score}", font=("Arial", 12, "bold"), fg="white",
+                                     bg="#5C4033")
+            self.score_label.place(x=711, y=16, width=119, height=31)
         self.score += score
         if self.score < 0:
             self.score = 0
